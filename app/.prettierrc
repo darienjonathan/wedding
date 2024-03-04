@@ -1,0 +1,9 @@
+{
+  "arrowParens": "avoid",
+  "printWidth": 100,
+  "pugAttributeSeparator": "none",
+  "pugSingleQuote": false,
+  "pugWrapAttributesThreshold": 1,
+  "semi": false,
+  "singleQuote": true
+}

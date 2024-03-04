@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    //-------------------------------------------------------------
+    // functions
+    //-------------------------------------------------------------
+    
+    // function isAuthenticated() {
+    //   return request.auth.uid != null;
+    // }
+
+    // function isSelf(uid) {
+    //   return request.auth.uid == uid;
+    // }
+
+    // Super Admin
+
+    function isSuperAdmin() {
+      return getSelfRole().data.name == 'superadmin';
+    }
+    
+    //-------------------------------------------------------------
+    // rules
+    //-------------------------------------------------------------
+
+    // Wedding
+
+    match /invitees/{inviteeUid} {
+      allow read: if true;
+    }
+
+    match /inviteeRSVP/{inviteeRSVPUid} {
+      allow read: if true;
+      allow write: if exists(/databases/$(database)/documents/invitees/$(inviteeRSVPUid));
+    }
+
+    match /wishes/{wishUid} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if exists(/databases/$(database)/documents/wishes/$(wishUid));
+    }
+
+    // Super Admin
+
+    match /{any=**} {
+      allow read: if isSuperAdmin();
+      allow write: if isSuperAdmin();
+    }
+  }
+}

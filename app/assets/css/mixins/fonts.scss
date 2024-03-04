@@ -1,0 +1,14 @@
+@use 'sass:map';
+@import '../variables';
+
+@mixin font-family($family: 'cabin') {
+  font-family: map.get($fonts, $family);
+}
+
+@mixin font($size: $font-m, $line-height: normal, $letter-spacing: normal, $color: $white) {
+  font-size: $size;
+  line-height: $line-height;
+  letter-spacing: $letter-spacing;
+  color: $color;
+  @content;
+}
