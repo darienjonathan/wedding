@@ -1,0 +1,51 @@
+{
+  "private": true,
+  "scripts": {
+    "copy-types": "sh sh/copyTypes.sh",
+    "dev": "nuxi dev",
+    "build": "nuxi build && yarn copy-types",
+    "build:firebase": "NITRO_PRESET=firebase yarn build",
+    "deploy:firebase": "yarn build:firebase && firebase deploy --only hosting,functions",
+    "start": "node .output/server/index.mjs"
+  },
+  "devDependencies": {
+    "@nuxt/eslint-config": "^0.2.0",
+    "@nuxtjs/eslint-config-typescript": "^7.0.2",
+    "@pinia/nuxt": "^0.4.11",
+    "@prettier/plugin-pug": "^1.17.3",
+    "@types/google.maps": "^3.50.4",
+    "@types/highlightjs": "^9.12.2",
+    "@types/markdown-it": "^12.2.3",
+    "@types/node": "^18.7.8",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "@volar/vue-language-plugin-pug": "^1.6.5",
+    "dayjs": "^1.11.10",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier-vue": "^3.1.0",
+    "eslint-plugin-vue": "^8.1.1",
+    "firebase-admin": "^11.0.1",
+    "firebase-functions": "^4.0.2",
+    "firebase-functions-test": "^2.4.0",
+    "nuxt": "^3.6.5",
+    "nuxt-multi-tenancy": "^1.0.2",
+    "pinia": "^2.1.6",
+    "prettier": "^2.4.1",
+    "pug": "^3.0.2",
+    "sass": "^1.44.0",
+    "sass-loader": "^12.3.0",
+    "typescript": "^4.5.2",
+    "vite-plugin-vue-type-imports": "^0.2.0",
+    "vue-eslint-parser": "^8.0.1",
+    "vue-tsc": "^0.40.13"
+  },
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.14.3",
+    "firebase": "^9.5.0",
+    "firebaseui": "^6.0.0",
+    "highlight.js": "^11.3.1",
+    "markdown-it": "^12.2.0"
+  }
+}

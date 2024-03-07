@@ -1,0 +1,74 @@
+@mixin size($width: auto, $height: auto) {
+  width: $width;
+  height: $height;
+}
+
+@mixin absolute($top: null, $right: null, $bottom: null, $left: null) {
+  position: absolute;
+  @if $top != null {
+    top: $top;
+  }
+  @if $right != null {
+    right: $right;
+  }
+  @if $bottom != null {
+    bottom: $bottom;
+  }
+  @if $left != null {
+    left: $left;
+  }
+}
+
+@mixin absolute-center($transforms: null) {
+  @include absolute($top: 50%, $left: 50%);
+  @if $transforms == null {
+    transform: translate(-50%, -50%);
+  } @else {
+    transform: translate(-50%, -50%) #{$transforms};
+  }
+}
+
+@mixin absolute-center-x($transforms: null) {
+  @include absolute($left: 50%);
+  @if $transforms == null {
+    transform: translateX(-50%);
+  } @else {
+    transform: translateX(-50%) #{$transforms};
+  }
+}
+
+@mixin absolute-center-y($transforms: null) {
+  @include absolute($top: 50%);
+  @if $transforms == null {
+    transform: translateY(-50%);
+  } @else {
+    transform: translateY(-50%) #{$transforms};
+  }
+}
+
+@mixin flex($direction: row, $justify: center, $align-items: center, $align-content: center, $wrap: nowrap, $is-inline: false) {
+  @if $is-inline == true {
+    display: inline-flex;
+  } @else {
+    display: flex;
+  }
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align-items;
+  align-content: $align-content;
+  flex-wrap: $wrap;
+}
+
+@mixin flex-gap($column-gap: 0, $row-gap: 0) {
+  flex-wrap: wrap;
+  margin-left: -0.5 * $column-gap;
+  margin-right: -0.5 * $column-gap;
+  margin-top: -0.5 * $row-gap;
+  margin-bottom: -0.5 * $row-gap;
+  & > * {
+    margin-left: 0.5 * $column-gap;
+    margin-right: 0.5 * $column-gap;
+    margin-top: 0.5 * $row-gap;
+    margin-bottom: 0.5 * $row-gap;
+  }
+}

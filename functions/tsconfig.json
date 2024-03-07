@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "~": [
+        "."
+      ],
+      "~/*": [
+        "./*"
+      ],
+      "src": [
+        "./src"
+      ],
+      "src/*": [
+        "src/*"
+      ],
+    }
+  },
+  "compileOnSave": true,
+}
