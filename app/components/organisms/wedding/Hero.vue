@@ -187,7 +187,7 @@ const kvDate = computed(() => {
   if (!earliestAvailableEvent) return
 
   const { timestamp, timezone } = earliestAvailableEvent
-  const dayjsObject = dayjs(timestamp, timezone)
+  const dayjsObject = dayjs(timestamp).tz(timezone)
 
   return dayjsObject.format('dddd, D MMMM YYYY')
 })
@@ -200,11 +200,11 @@ const streamingEventText = computed(() => {
   if (!eventToShowStreaming.value) return
 
   const { timestamp, timezone } = eventToShowStreaming.value
-  const dayjsObject = dayjs(timestamp, timezone)
+  const dayjsObject = dayjs(timestamp).tz(timezone)
   const time = dayjsObject.format('D MMMM YYYY, HH:mm')
   const timezoneText = getTimezoneText(eventToShowStreaming.value.timezone, dayjsObject)
 
-  return `Live Streaming of ${eventToShowStreaming.value.eventName} starts at ${time} ${timezoneText}`
+  return `${eventToShowStreaming.value.eventName} Live Streaming starts at ${time} ${timezoneText}`
 })
 
 // --------------------------------------------------

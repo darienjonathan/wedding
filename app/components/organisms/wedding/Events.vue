@@ -83,7 +83,7 @@ const { eventSectionShowStates } = useWeddingSettings(
 const dayjs = useNuxtApp().$dayjs
 
 const getDate = (timestamp: number, timezone: string) => {
-  const dayjsObject = dayjs(timestamp, timezone)
+  const dayjsObject = dayjs(timestamp).tz(timezone)
   const date = dayjsObject.format('dddd, D MMMM YYYY')
   const offset = getTimezoneText(timezone, dayjsObject)
 

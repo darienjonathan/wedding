@@ -13,8 +13,8 @@ dayjs.extend(isSameOrAfter)
 export default defineNuxtPlugin(() => {
   return {
     provide: {
-      dayjs: (timestamp: number | null = null, timezone = 'Asia/Jakarta') =>
-        dayjs(getTimestampByFormat(timestamp || Date.now(), 'js'), timezone),
+      dayjs: (timestamp: number | null = null) =>
+        dayjs(getTimestampByFormat(timestamp || Date.now(), 'js')),
     },
   }
 })
