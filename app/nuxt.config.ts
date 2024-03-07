@@ -1,8 +1,11 @@
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
-  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy'],
+  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy', '@nuxt/image'],
   build: {
     transpile: ['@googlemaps/js-api-loader'],
+  },
+  image: {
+    quality: 50,
   },
   app: {
     head: {

@@ -5,7 +5,11 @@
     .hero__button-intersection-observer(ref="buttonObserverElementRef")
     .hero__intersection-observer(ref="observerElementRef")
   .hero__content(:data-is-blur="isBlur")
-    img.hero__image(:src="heroImageSrc")
+    NuxtImg.hero__image(
+      v-if="heroImageSrc"
+      :src="heroImageSrc"
+      @load="$emit('loadingDone')"
+    )
     template(v-if="!isNotInvited")
       .hero__invitation-text.invitation-text
         .invitation-text__type {{ invitationTypeText }}
@@ -140,7 +144,6 @@ onMounted(() => {
   )
   observer.observe(observerElementRef.value)
   observerInstance.value = observer
-  emit('loadingDone')
 })
 
 onUnmounted(() => {

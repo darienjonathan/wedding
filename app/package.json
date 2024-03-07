@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.14.3",
+    "@nuxt/image": "^1.4.0",
     "firebase": "^9.5.0",
     "firebaseui": "^6.0.0",
     "highlight.js": "^11.3.1",
