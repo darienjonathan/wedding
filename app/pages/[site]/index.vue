@@ -115,8 +115,6 @@ const isInviteeDataLoaded = computed(
 // Wedding Settings
 // --------------------------------------------------
 
-const router = useRouter()
-
 const { data: weddingSettings, status: weddingSettingsFetchStatus } =
   await useFetch<WeddingSettings>('/api/fetchWeddingSettings', {
     query: { tenantId },
@@ -126,7 +124,7 @@ watch(
   [weddingSettingsFetchStatus],
   () => {
     if (weddingSettingsFetchStatus.value === 'error') {
-      router.replace('/404')
+      navigateTo('404')
     }
   },
   {
