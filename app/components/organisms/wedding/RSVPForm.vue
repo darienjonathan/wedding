@@ -78,14 +78,14 @@
   ) {{ inviteeRSVP ? 'Update' : 'Submit' }}
 </template>
 <script lang="ts" setup>
-import { phoneCodeList } from '~/utils/phone'
 import MInput from '~/components/molecules/wedding/MInput.vue'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
-import { useInvitee } from '~/composables/wedding/useInvitee'
+import { phoneCodeList } from '~/utils/phone'
 
 type Props = {
   invitee: Invitee
   inviteeRSVP: InviteeRSVP | null
+  isReceptionInvitation: boolean
 }
 
 const props = defineProps({
@@ -97,11 +97,13 @@ const props = defineProps({
     type: Object as () => Props['inviteeRSVP'],
     default: null,
   },
+  isReceptionInvitation: {
+    type: Boolean as () => Props['isReceptionInvitation'],
+    default: false,
+  },
 })
 
 const emit = defineEmits<{ (e: 'submit', inviteeRSVP: InviteeRSVP): void }>()
-
-const { isReceptionInvitation } = useInvitee(toRef(props, 'invitee'), toRef(props, 'inviteeRSVP'))
 
 // --------------------------------------------------
 // Form

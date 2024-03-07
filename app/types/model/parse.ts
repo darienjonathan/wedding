@@ -8,7 +8,7 @@ const defaultValues = {
 }
 
 export function parseString(data: any) {
-  return String(data || defaultValues.string)
+  return String(data || defaultValues.string).replace('\\n', '\n')
 }
 
 export function parseNumber(data: any) {

@@ -5,18 +5,20 @@
     .hero__button-intersection-observer(ref="buttonObserverElementRef")
     .hero__intersection-observer(ref="observerElementRef")
   .hero__content(:data-is-blur="isBlur")
-    img.hero__image(src="~/assets/images/wedding/kv.jpg")
+    img.hero__image(:src="heroImageSrc")
     template(v-if="!isNotInvited")
       .hero__invitation-text.invitation-text
         .invitation-text__type {{ invitationTypeText }}
         .invitation-text__name {{ inviteeNameText }}
     .hero__kv.kv
-      .kv__subheading.kv__subheading--jp {{ '恵みを語るメロディー' }}
-      .kv__subheading.kv__subheading--en {{ 'The Melody of Grace' }}
-      .kv__heading {{ 'DARIEN & DAISY' }}
+      template(v-if="weddingSettings?.hero.tagline.jp")
+        .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
+      template(v-if="weddingSettings?.hero.tagline.en")
+        .kv__subheading.kv__subheading--en {{ weddingSettings?.hero.tagline.en }}
+      .kv__heading {{ weddingSettings?.hero.title.toLocaleUpperCase() }}
       .kv__line
-      .kv__date {{ 'Saturday, 6 January 2024' }}
-      template(v-if="!isNotInvited")
+      .kv__date {{ kvDate }}
+      template(v-if="isEventSectionShown")
         .kv__nav-btn
           .nav-btn__icon.material-icons-outlined expand_more
           .nav-btn__text(@click="emit('navClick')") {{ 'Events' }}
@@ -29,28 +31,34 @@
             :data-is-blur="isButtonBlur"
           ) {{ inviteeRSVP ? 'Review Your RSVP' : 'Wedding Reception RSVP' }}
         a.bottom__button.bottom__button--right(
-          v-if="isNotInvited"
-          :href="streamingButtonLink"
+          v-if="eventToShowStreaming"
+          :href="eventToShowStreaming.streamingLink"
           :data-is-blur="isButtonBlur"
           target="_blank"
           rel="noopener noreferrer"
           role="button"
         ) {{ 'Attend Online' }}
-      .bottom__text(v-if="isNotInvited") {{ 'Live streaming starts at 10:00 AM WIB (UTC+7)' }}
+      .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
 </template>
 <script lang="ts" setup>
-import dayjs from 'dayjs'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import { useStorage } from '~/composables/firebase/storage/useStorage'
 import { useInvitee } from '~/composables/wedding/useInvitee'
+import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
-dayjs.extend(isSameOrAfter)
+import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import { getTimezoneText } from '~/utils/time'
 
 type Props = {
+  weddingSettings: WeddingSettings | null
   invitee: Invitee | null
   inviteeRSVP: InviteeRSVP | null
 }
 
 const props = defineProps({
+  weddingSettings: {
+    type: Object as () => Props['weddingSettings'],
+    default: null,
+  },
   invitee: {
     type: Object as () => Props['invitee'],
     default: null,
@@ -61,10 +69,12 @@ const props = defineProps({
   },
 })
 
-const { isReceptionInvitation, isMatrimonyInvitation, isNotInvited } = useInvitee(
-  toRef(props, 'invitee'),
-  toRef(props, 'inviteeRSVP')
-)
+const { isReceptionInvitation, isMatrimonyInvitation, isNotInvited, canRSVP, canReviewRSVP } =
+  useInvitee(
+    toRef(props, 'invitee'),
+    toRef(props, 'inviteeRSVP'),
+    computed(() => props.weddingSettings?.rsvp || null)
+  )
 
 const invitationTypeText = computed(() => {
   if (isReceptionInvitation.value) return 'Holy Matrimony & Wedding Reception Invitation'
@@ -87,6 +97,26 @@ const inviteeNameText = computed(() => {
 })
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
+
+// --------------------------------------------------
+// Hero Image
+// --------------------------------------------------
+
+const storage = useStorage()
+
+const heroImageSrc = ref('')
+
+watch(
+  () => props.weddingSettings,
+  async settings => {
+    if (!settings) return
+
+    heroImageSrc.value = await storage.getDownloadURL(settings?.hero.imageSrc)
+  },
+  {
+    immediate: true,
+  }
+)
 
 // --------------------------------------------------
 // Hero Intersection Observer
@@ -116,6 +146,62 @@ onMounted(() => {
 onUnmounted(() => {
   if (!observerInstance.value) return
   observerInstance.value.disconnect()
+})
+
+// --------------------------------------------------
+// Events
+// --------------------------------------------------
+
+const { isEventSectionShown } = useWeddingSettings(
+  toRef(props, 'weddingSettings'),
+  toRef(props, 'invitee'),
+  toRef(props, 'inviteeRSVP')
+)
+
+const dayjs = useNuxtApp().$dayjs
+
+const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => boolean) => {
+  const events = [...(props.weddingSettings?.events || [])]
+  let nextEvents = events.filter(
+    weddingEvent =>
+      (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp))
+  )
+
+  if (!nextEvents.length) {
+    nextEvents = events.filter(weddingEvent => (filterFn ? filterFn(weddingEvent) : true))
+  }
+
+  return nextEvents.sort((firstEvent, secondEvent) => {
+    const firstEventTimestamp = firstEvent.timestamp || 0
+    const secondEventTimestamp = secondEvent.timestamp || 0
+
+    return firstEventTimestamp - secondEventTimestamp
+  })[0]
+}
+
+const kvDate = computed(() => {
+  const earliestAvailableEvent = getEarliestAvailableEvent()
+  if (!earliestAvailableEvent) return
+
+  const { timestamp, timezone } = earliestAvailableEvent
+  const dayjsObject = dayjs(timestamp, timezone)
+
+  return dayjsObject.format('dddd, D MMMM YYYY')
+})
+
+const eventToShowStreaming = computed(() =>
+  getEarliestAvailableEvent(weddingEvent => !!weddingEvent.streamingLink)
+)
+
+const streamingEventText = computed(() => {
+  if (!eventToShowStreaming.value) return
+
+  const { timestamp, timezone } = eventToShowStreaming.value
+  const dayjsObject = dayjs(timestamp, timezone)
+  const time = dayjsObject.format('D MMMM YYYY, HH:mm')
+  const timezoneText = getTimezoneText(eventToShowStreaming.value.timezone, dayjsObject)
+
+  return `Live Streaming of ${eventToShowStreaming.value.eventName} starts at ${time} ${timezoneText}`
 })
 
 // --------------------------------------------------
@@ -151,13 +237,9 @@ const handleClickRSVPButton = () => {
   emit('RSVPButtonClick')
 }
 
-const { canRSVP, canReviewRSVP } = useInvitee(toRef(props, 'invitee'), toRef(props, 'inviteeRSVP'))
 const shouldShowRSVPButton = computed(() => {
   return canRSVP.value || canReviewRSVP.value
 })
-
-const config = useRuntimeConfig().public.wedding
-const streamingButtonLink = computed(() => config.streamingLink)
 </script>
 <script lang="ts">
 export default {

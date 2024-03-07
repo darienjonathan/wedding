@@ -5,6 +5,7 @@
       :is-open="isRSVPModalOpen"
       :invitee="invitee"
       :inviteeRSVP="databaseInviteeRSVP"
+      :rsvpSettings="rsvpSettings"
       @close="$emit('closeRSVPModal')"
       @submit="handleSubmitRSVP"
     )
@@ -21,20 +22,27 @@
     )
 </template>
 <script lang="ts" setup>
-import RSVPModal from '~/components/organisms/wedding/RSVPModal.vue'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import ConfirmRSVPModal from '~/components/organisms/wedding/ConfirmRSVPModal.vue'
+import RSVPModal from '~/components/organisms/wedding/RSVPModal.vue'
 import useUid from '~/composables/wedding/useUid'
+import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
+import type { RSVP } from '~/types/model/wedding/weddingSettings'
 
 const { uid } = useUid()
 
 type Props = {
+  tenantId: string
   isRSVPModalOpen: boolean
   invitee: Invitee | null
   databaseInviteeRSVP: InviteeRSVP | null
+  rsvpSettings: RSVP | null
 }
 
-defineProps({
+const props = defineProps({
+  tenantId: {
+    type: String as () => Props['tenantId'],
+    required: true,
+  },
   isRSVPModalOpen: {
     type: Boolean as () => Props['isRSVPModalOpen'],
     default: false,
@@ -45,6 +53,10 @@ defineProps({
   },
   databaseInviteeRSVP: {
     type: Object as () => Props['databaseInviteeRSVP'],
+    default: null,
+  },
+  rsvpSettings: {
+    type: Object as () => Props['rsvpSettings'],
     default: null,
   },
 })
@@ -87,7 +99,7 @@ const handleCloseRSVPSubmission = () => {
 }
 
 const { useInviteeRSVP } = useFirestoreCollections()
-const inviteeRSVPFirestore = useInviteeRSVP()
+const inviteeRSVPFirestore = useInviteeRSVP(props.tenantId)
 
 const handleConfirmRSVP = () => {
   if (shouldCloseModal.value) {

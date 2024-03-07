@@ -1,9 +1,8 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /assets/{asset=**} {
+    match /wedding/{asset=**} {
       allow read: if true;
-      allow write: if request.auth.uid != null;
     }
   }
 }

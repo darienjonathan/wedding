@@ -2,15 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { parseString, parseNumber, parseBoolean } from '~/types/model/parse'
-
-// Invitees that is invited to reception is considered to be invited to matrimony as well
-export type InvitationType = 'reception' | 'matrimony' | null
-export const parseInvitationType = (invitationType: any): InvitationType => {
-  const stringifiedType = parseString(invitationType)
-  if (stringifiedType === 'reception') return 'reception'
-  if (stringifiedType === 'matrimony') return 'matrimony'
-  return null
-}
+import { InvitationType, parseInvitationType } from '~/types/model/wedding/weddingSettings'
 
 export type InviteePrefix =
   | 'Mr.'

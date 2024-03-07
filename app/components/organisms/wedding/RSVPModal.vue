@@ -17,24 +17,26 @@ AModal.rsvp-modal(
           :key="String(forceRerender)"
           :invitee="invitee"
           :inviteeRSVP="inviteeRSVP"
+          :isReceptionInvitation="isReceptionInvitation"
           @submit="handleSubmit"
         )
 </template>
 
 <script lang="ts" setup>
-import MRSVPNotes from '~/components/molecules/wedding/MRSVPNotes.vue'
-import AModal from '~/components/atoms/AModal.vue'
-import useMedia from '~/composables/useMedia'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import ALoading from '~/components/atoms/ALoading.vue'
+import AModal from '~/components/atoms/AModal.vue'
+import MRSVPNotes from '~/components/molecules/wedding/MRSVPNotes.vue'
 import RSVPForm from '~/components/organisms/wedding/RSVPForm.vue'
-
+import useMedia from '~/composables/useMedia'
 import { useInvitee } from '~/composables/wedding/useInvitee'
+import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
+import type { RSVP } from '~/types/model/wedding/weddingSettings'
 
 type Props = {
   isOpen: boolean
   invitee: Invitee
   inviteeRSVP: InviteeRSVP | null
+  rsvpSettings: RSVP | null
 }
 
 const props = defineProps({
@@ -50,13 +52,21 @@ const props = defineProps({
     type: Object as () => Props['inviteeRSVP'],
     default: null,
   },
+  rsvpSettings: {
+    type: Object as () => Props['rsvpSettings'],
+    default: null,
+  },
 })
 
 const emit = defineEmits(['close', 'submit'])
 
 const { isSP } = useMedia()
 
-const { canRSVP, canEditRSVP } = useInvitee(toRef(props, 'invitee'), toRef(props, 'inviteeRSVP'))
+const { canRSVP, canEditRSVP, isReceptionInvitation } = useInvitee(
+  toRef(props, 'invitee'),
+  toRef(props, 'inviteeRSVP'),
+  toRef(props, 'rsvpSettings')
+)
 
 const handleSubmit = (inviteeRSVP: InviteeRSVP) => {
   emit('submit', inviteeRSVP)

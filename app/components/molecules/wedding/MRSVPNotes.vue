@@ -42,15 +42,21 @@
 </template>
 
 <script lang="ts" setup>
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import { useInvitee } from '~/composables/wedding/useInvitee'
+import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
+import type { RSVP } from '~/types/model/wedding/weddingSettings'
 
 type Props = {
+  rsvpSettings: RSVP | null
   invitee: Invitee | null
   inviteeRSVP: InviteeRSVP | null
 }
 
 const props = defineProps({
+  rsvpSettings: {
+    type: Object as () => Props['rsvpSettings'],
+    default: null,
+  },
   invitee: {
     type: Object as () => Props['invitee'],
     default: null,
@@ -68,7 +74,7 @@ const {
   canReviewRSVP,
   shouldContact,
   rsvpDeadlineString,
-} = useInvitee(toRef(props, 'invitee'), toRef(props, 'inviteeRSVP'))
+} = useInvitee(toRef(props, 'invitee'), toRef(props, 'inviteeRSVP'), toRef(props, 'rsvpSettings'))
 
 const invitationStatusText = computed(() => {
   if (props.inviteeRSVP)

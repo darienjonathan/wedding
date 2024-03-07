@@ -1,41 +1,40 @@
 <template lang="pug">
 .events
   .heading__wrapper
-    .heading {{ 'EVENTS' }}
-    .heading__sub {{ subHeadingText }}
+    .heading {{ weddingSettings?.sectionSettings.event.title.toLocaleUpperCase() || 'EVENTS' }}
 
-  template(v-if="!isNotInvited")
-    .content
-      .content__heading {{ 'HOLY MATRIMONY' }}
-      .content__item
-        .item__text
-          .item__info
-            .info__main {{ 'Gereja Kristus Yesus (GKY)\nMangga Besar' }}
-            .info__sub {{ 'Saturday, 6 January 2024,\n10:00 AM WIB (UTC+7)' }}
-          .item__info
-            .info__sub {{ 'We would love to have your physical presence at our marriage\'s holy matrimony. However, if you are unable to attend physically, please attend online through below link:' }}
-            a.button(
-              :href="streamingButtonLink"
-              target="_blank"
-              rel="noopener noreferrer"
-              role="button"
-            ) {{ 'Attend Online' }}
-        .item__graphic.item__graphic--map(ref="holyMatrimonyMapElementRef")
+  .kv
+    .kv__main {{ weddingSettings?.sectionSettings.event.description.main }}
+    .kv__sub {{ weddingSettings?.sectionSettings.event.description.sub }}
 
-  template(v-if="isReceptionInvitation") 
-    .content(data-order="reverse")
-      .content__heading {{ 'WEDDING RECEPTION' }}
-      .content__item
-        .item__text
-          .item__info
-            .info__main {{ 'Sailendra Restaurant -\nJW Marriott Hotel Jakarta' }}
-            .info__sub {{ 'Saturday, 6 January 2024,\n18:30 WIB' }}
-        .item__graphic.item__graphic--map(ref="receptionMapElementRef")
+  template(v-for="(weddingEvent, index) in (weddingSettings?.events || [])")
+    template(v-if="weddingEvent.type ? eventSectionShowStates[weddingEvent.type] : true")
+      .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
+        .content__heading {{ weddingEvent.eventName.toLocaleUpperCase() }}
+        .content__item
+          .item__text
+            .item__info
+              .info__main {{ weddingEvent.venue }}
+              .info__sub {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
+            template(v-if="weddingEvent.streamingLink")
+              .item__info
+                .info__sub {{ 'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:' }}
+                a.button(
+                  :href="weddingEvent.streamingLink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="button"
+                ) {{ 'Attend Online' }}
+          .item__graphic.item__graphic--map(
+            ref="mapElementRefs"
+            :data-index="index"
+          )
   template(v-if="shouldShowRSVPSection")
     .content
-      .content__heading {{ 'WEDDING RECEPTION RSVP' }}
+      .content__heading {{ 'RSVP' }}
       .content__item
         MRSVPNotes(
+          :rsvpSettings="weddingSettings?.rsvp"
           :invitee="invitee"
           :inviteeRSVP="databaseInviteeRSVP"
         )
@@ -43,21 +42,29 @@
         .button(@click="handleClickRSVPButton") {{ databaseInviteeRSVP ? 'Edit Your RSVP' : 'RSVP Here' }}
 </template>
 <script lang="ts" setup>
-import { useInvitee } from '~/composables/wedding/useInvitee'
 import MRSVPNotes from '~/components/molecules/wedding/MRSVPNotes.vue'
-import useMap from '~/composables/wedding/useMap'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import ConfirmRSVPModal from '~/components/organisms/wedding/ConfirmRSVPModal.vue'
+import { useInvitee } from '~/composables/wedding/useInvitee'
+import { useMap } from '~/composables/wedding/useMap'
+import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
+import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
+import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import { getTimezoneText } from '~/utils/time'
 
 type Props = {
+  weddingSettings: WeddingSettings | null
   invitee: Invitee | null
   databaseInviteeRSVP: InviteeRSVP | null
 }
 
 const props = defineProps({
+  weddingSettings: {
+    type: Object as () => Props['weddingSettings'],
+    required: true,
+  },
   invitee: {
     type: Object as () => Props['invitee'],
-    required: true,
+    default: null,
   },
   databaseInviteeRSVP: {
     type: Object as () => Props['databaseInviteeRSVP'],
@@ -65,31 +72,46 @@ const props = defineProps({
   },
 })
 
-const {
-  isReceptionInvitation,
-  isMatrimonyInvitation,
-  isNotInvited,
-  canRSVP,
-  canReviewRSVP,
-  canEditRSVP,
-  shouldContact,
-} = useInvitee(toRef(props, 'invitee'), toRef(props, 'databaseInviteeRSVP'))
+// SETTINGS
 
-const subHeadingText = computed(() => {
-  if (isReceptionInvitation.value)
-    return "We would love to have your presence and blessings at our marriage's holy matrimony and wedding reception."
-  if (isMatrimonyInvitation.value)
-    return "We would love to have your presence and blessings at our marriage's holy matrimony."
-  return "We would love to have your presence and blessings at the live streaming of our marriage's holy matrimony."
-})
+const { eventSectionShowStates } = useWeddingSettings(
+  toRef(props, 'weddingSettings'),
+  toRef(props, 'invitee'),
+  toRef(props, 'databaseInviteeRSVP')
+)
 
-const config = useRuntimeConfig().public.wedding
-const streamingButtonLink = computed(() => config.streamingLink)
+const dayjs = useNuxtApp().$dayjs
 
-const { receptionMapElementRef, holyMatrimonyMapElementRef } = useMap()
+const getDate = (timestamp: number, timezone: string) => {
+  const dayjsObject = dayjs(timestamp, timezone)
+  const date = dayjsObject.format('dddd, D MMMM YYYY')
+  const offset = getTimezoneText(timezone, dayjsObject)
+
+  return `${date} ${offset}`
+}
+
+// INVITEE
+
+const { canRSVP, canReviewRSVP, canEditRSVP, shouldContact } = useInvitee(
+  toRef(props, 'invitee'),
+  toRef(props, 'databaseInviteeRSVP'),
+  computed(() => props.weddingSettings?.rsvp || null)
+)
+
+const events = ref<WeddingEvent[]>([])
+watch(
+  () => props.weddingSettings,
+  weddingSettings => {
+    events.value = weddingSettings?.events || []
+  },
+  {
+    immediate: true,
+  }
+)
+const { mapElementRefs } = useMap(events)
 
 const shouldShowRSVPSection = computed(
-  () => canRSVP.value || canReviewRSVP.value || shouldContact.value
+  () => props.weddingSettings?.rsvp && (canRSVP.value || canReviewRSVP.value || shouldContact.value)
 )
 const emit = defineEmits(['RSVPButtonClick'])
 
@@ -112,19 +134,51 @@ export default {
     margin-bottom: 60px;
   }
 
-  &,
-  &__sub {
-    @include font-family('marcellus');
-    text-align: center;
-  }
-
   & {
+    @include font-family('marcellus');
     margin-bottom: 20px;
+    text-align: center;
     @include pc {
       @include font($size: $font-xxhuge, $letter-spacing: 2px);
     }
     @include sp {
       @include font($size: $font-xhuge, $letter-spacing: 2px);
+    }
+  }
+}
+
+.kv {
+  & {
+    @include font-family('marcellus');
+    text-align: center;
+    margin: 0 auto 60px;
+    @include pc {
+      padding: 0 40px;
+      max-width: 1200px;
+    }
+    @include sp {
+      width: 100%;
+      padding: 0 20px;
+    }
+  }
+
+  &__main {
+    white-space: pre-line;
+    @include pc {
+      margin-bottom: 8px;
+    }
+    @include sp {
+      @include font($size: $font-sm, $line-height: 1.5);
+      margin-bottom: 16px;
+    }
+  }
+
+  &__sub {
+    @include pc {
+      @include font($size: $font-sm);
+    }
+    @include sp {
+      @include font($size: $font-xs);
     }
   }
 }

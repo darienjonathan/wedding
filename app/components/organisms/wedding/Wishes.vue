@@ -1,7 +1,7 @@
 <template lang="pug">
 .wishes
   .heading__wrapper
-    .heading {{ 'GREETINGS & WISHES' }}
+    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'GREETINGS & WISHES' }}
   .content
     .content__form.form
       input.form__name(
@@ -30,16 +30,24 @@
         .item__empty-text {{ 'Be the first to greet the couple!' }}
 </template>
 <script lang="ts" setup>
-import type { Unsubscribe } from 'firebase/firestore'
 import dayjs from 'dayjs'
+import type { Unsubscribe } from 'firebase/firestore'
 import useUid from '~/composables/wedding/useUid'
+import type { SectionSettings } from '~/types/model/wedding/weddingSettings'
 import type { Wish } from '~/types/model/wedding/wish'
 
 const WISH_UID_LOCALSTORAGE_KEY = 'wish_uid'
 
+type Props = {
+  tenantId: string
+  sectionSettings: SectionSettings
+}
+
+const props = defineProps<Props>()
+
 const { uid } = useUid()
 const { useWishes } = useFirestoreCollections()
-const wishesFirestore = useWishes()
+const wishesFirestore = useWishes(props.tenantId)
 
 const existingWish = ref<Wish>()
 const currentWish = ref<Wish>({

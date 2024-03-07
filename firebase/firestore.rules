@@ -3,49 +3,28 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     //-------------------------------------------------------------
-    // functions
-    //-------------------------------------------------------------
-    
-    // function isAuthenticated() {
-    //   return request.auth.uid != null;
-    // }
-
-    // function isSelf(uid) {
-    //   return request.auth.uid == uid;
-    // }
-
-    // Super Admin
-
-    function isSuperAdmin() {
-      return getSelfRole().data.name == 'superadmin';
-    }
-    
-    //-------------------------------------------------------------
     // rules
     //-------------------------------------------------------------
 
     // Wedding
 
-    match /invitees/{inviteeUid} {
+    match /wedding/{tenantId}/weddingSettings/{weddingSettingsId} {
       allow read: if true;
     }
 
-    match /inviteeRSVP/{inviteeRSVPUid} {
+    match /wedding/{tenantId}/invitees/{inviteeUid} {
       allow read: if true;
-      allow write: if exists(/databases/$(database)/documents/invitees/$(inviteeRSVPUid));
     }
 
-    match /wishes/{wishUid} {
+    match /wedding/{tenantId}/inviteeRSVP/{inviteeRSVPUid} {
+      allow read: if true;
+      allow write: if exists(/databases/$(database)/documents/wedding/$(tenantId)/invitees/$(inviteeRSVPUid));
+    }
+
+    match /wedding/{tenantId}/wishes/{wishUid} {
       allow read: if true;
       allow create: if true;
-      allow update: if exists(/databases/$(database)/documents/wishes/$(wishUid));
-    }
-
-    // Super Admin
-
-    match /{any=**} {
-      allow read: if isSuperAdmin();
-      allow write: if isSuperAdmin();
+      allow update: if exists(/databases/$(database)/documents/wedding/$(tenantId)/wishes/$(wishUid));
     }
   }
 }

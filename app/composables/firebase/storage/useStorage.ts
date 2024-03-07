@@ -20,13 +20,12 @@ interface PutStringArgs extends PutArgs<string> {
   stringFormat?: StringFormat
 }
 
-const useStorage = (path: string, allowedTypes?: string[]) => {
+export const useStorage = (path = '', allowedTypes?: string[]) => {
   const { instance: storage, getDownloadURL: storageGetDownloadURL } =
     useNuxtApp().$firebase.storage
 
-  const storageRef = computed(() => reference(storage, path))
-
-  const getFileRef = (fileName: string): StorageReference => reference(storageRef.value, fileName)
+  const getFileRef = (fileName = ''): StorageReference =>
+    reference(storage, [path, fileName].filter(v => v).join('/'))
 
   const validate = (type: string): boolean => (allowedTypes ? allowedTypes.includes(type) : true)
 
@@ -47,7 +46,7 @@ const useStorage = (path: string, allowedTypes?: string[]) => {
   const getDownloadURL = (fileName: string): Promise<string> =>
     storageGetDownloadURL(getFileRef(fileName).fullPath)
 
-  const list = () => listAll(storageRef.value)
+  const list = () => listAll(getFileRef())
 
   const put = async ({ file, fileName, customMetadata }: PutArgs<File>) => {
     const isValidated = validate(file.type)
@@ -99,5 +98,3 @@ const useStorage = (path: string, allowedTypes?: string[]) => {
     deleteItem,
   }
 }
-
-export default useStorage

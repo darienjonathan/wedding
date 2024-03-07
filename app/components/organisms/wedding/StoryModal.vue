@@ -10,7 +10,7 @@ AModal.story-modal(
     .content
       img.content__thumbnail(
         loading="lazy"
-        :src="story.thumbnail"
+        :src="story.picture"
       )
       .content__full-text
         template(v-for="content in story.contents")
@@ -18,9 +18,9 @@ AModal.story-modal(
 </template>
 
 <script lang="ts" setup>
-import AModal from '~/components/atoms/AModal.vue'
 import ALoading from '~/components/atoms/ALoading.vue'
-import type { Story } from '~/types/model/wedding/story'
+import AModal from '~/components/atoms/AModal.vue'
+import type { Story } from '~/types/model/wedding/weddingSettings'
 
 type Props = {
   isOpen: boolean

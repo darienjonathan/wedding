@@ -1,11 +1,17 @@
 <template lang="pug">
 .gallery
   .heading__wrapper
-    .heading {{ 'GALLERY' }}
+    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'GALLERY' }}
+  .kv
+    .kv__main {{ sectionSettings.description.main }}
+    .kv__sub {{ sectionSettings.description.sub }}
   .content
     .loading-wrapper(:data-loaded="isAllImageLoaded")
       ALoading
-    .grid(:data-loaded="isAllImageLoaded")
+    .grid(
+      :data-loaded="isAllImageLoaded"
+      :data-layout-type="gallery.layoutType"
+    )
       template(v-for="imageState in imageStates")
         .image(
           :class="`image--${imageState.order}`"
@@ -33,20 +39,10 @@
       )
 </template>
 <script lang="ts" setup>
-import AModal from '~/components/atoms/AModal.vue'
 import ALoading from '~/components/atoms/ALoading.vue'
-import image1 from '~/assets/images/wedding/gallery/image_1.jpg'
-import image2 from '~/assets/images/wedding/gallery/image_2.jpg'
-import image3 from '~/assets/images/wedding/gallery/image_3.jpg'
-import image4 from '~/assets/images/wedding/gallery/image_4.jpg'
-import image5 from '~/assets/images/wedding/gallery/image_5.jpg'
-import image6 from '~/assets/images/wedding/gallery/image_6.jpg'
-import image7 from '~/assets/images/wedding/gallery/image_7.jpg'
-import image8 from '~/assets/images/wedding/gallery/image_8.jpg'
-import image9 from '~/assets/images/wedding/gallery/image_9.jpg'
-import image10 from '~/assets/images/wedding/gallery/image_10.jpg'
-
-const imageSrcs = [image1, image2, image3, image4, image5, image6, image7, image8, image9, image10]
+import AModal from '~/components/atoms/AModal.vue'
+import { useStorage } from '~/composables/firebase/storage/useStorage'
+import type { Gallery, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
 type ImageState = {
   src: string
@@ -56,7 +52,20 @@ type ImageState = {
   height?: string
 }
 
-const initializeImageStates = (): ImageState[] =>
+type Props = {
+  sectionSettings: SectionSettings
+  gallery: Gallery
+}
+
+const props = defineProps<Props>()
+
+/**
+ * Download Images
+ */
+
+const storage = useStorage('')
+
+const getInitialImageStates = (imageSrcs: string[]): ImageState[] =>
   imageSrcs.map((src, index) => ({
     src,
     order: index + 1,
@@ -65,8 +74,19 @@ const initializeImageStates = (): ImageState[] =>
     height: undefined,
   }))
 
-const imageStates = ref<ImageState[]>(initializeImageStates())
+const imageStates = ref<ImageState[]>([])
 const imgRefs = ref<HTMLImageElement[]>([])
+
+watch(
+  () => props.gallery,
+  async gallery => {
+    const imageSrcs = await Promise.all(gallery.imageSrcs.map(storage.getDownloadURL))
+    imageStates.value = getInitialImageStates(imageSrcs)
+  },
+  {
+    immediate: true,
+  }
+)
 
 const { vw, vh, getValues } = useViewportUnitSizes()
 
@@ -187,6 +207,42 @@ export default {
   }
 }
 
+.kv {
+  & {
+    @include font-family('marcellus');
+    text-align: center;
+    margin: 0 auto 60px;
+    @include pc {
+      padding: 0 40px;
+      max-width: 1200px;
+    }
+    @include sp {
+      width: 100%;
+      padding: 0 20px;
+    }
+  }
+
+  &__main {
+    white-space: pre-line;
+    @include pc {
+      margin-bottom: 8px;
+    }
+    @include sp {
+      @include font($size: $font-sm, $line-height: 1.5);
+      margin-bottom: 16px;
+    }
+  }
+
+  &__sub {
+    @include pc {
+      @include font($size: $font-sm);
+    }
+    @include sp {
+      @include font($size: $font-xs);
+    }
+  }
+}
+
 .content {
   position: relative;
   margin: 0 auto;
@@ -217,13 +273,24 @@ export default {
     opacity: 1;
   }
 
-  @include pc {
-    grid-template-rows: repeat(10, 1fr);
-    grid-template-columns: repeat(9, 1fr);
+  &[data-layout-type='default'] {
+    @include pc {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @include sp {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
-  @include sp {
-    grid-template-rows: repeat(15, 1fr);
-    grid-template-columns: repeat(6, 1fr);
+
+  &[data-layout-type='custom'] {
+    @include pc {
+      grid-template-rows: repeat(10, 1fr);
+      grid-template-columns: repeat(9, 1fr);
+    }
+    @include sp {
+      grid-template-rows: repeat(15, 1fr);
+      grid-template-columns: repeat(6, 1fr);
+    }
   }
 }
 
@@ -240,41 +307,41 @@ export default {
 }
 
 .image {
+  @include flex;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  filter: drop-shadow(0 0 5px $black);
+  transition: filter 0.5s ease-in-out;
+
+  &::after {
+    @include absolute($top: 0, $left: 0);
+    @include size(100%, 100%);
+    content: '';
+    transition: background-color 0.4s ease-in-out;
+    pointer-events: none;
+  }
+
+  &:hover {
+    filter: drop-shadow(0 0 10px $black);
+
+    &::after {
+      background-color: rgba($white, 0.25);
+    }
+  }
+
+  img {
+    @include size(100%, 100%);
+    object-fit: cover;
+  }
+}
+
+.grid[data-layout-type='custom'] .image {
   @mixin image($grid-row-start, $grid-row-end, $grid-column-start, $grid-column-end) {
     grid-row-start: $grid-row-start;
     grid-row-end: $grid-row-end;
     grid-column-start: $grid-column-start;
     grid-column-end: $grid-column-end;
-  }
-
-  & {
-    @include flex;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    filter: drop-shadow(0 0 5px $black);
-    transition: filter 0.5s ease-in-out;
-
-    &::after {
-      @include absolute($top: 0, $left: 0);
-      @include size(100%, 100%);
-      content: '';
-      transition: background-color 0.4s ease-in-out;
-      pointer-events: none;
-    }
-
-    &:hover {
-      filter: drop-shadow(0 0 10px $black);
-
-      &::after {
-        background-color: rgba($white, 0.25);
-      }
-    }
-
-    img {
-      @include size(100%, 100%);
-      object-fit: cover;
-    }
   }
 
   &--1 {

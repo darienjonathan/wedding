@@ -1,37 +1,100 @@
 <template lang="pug">
 .about-us
   .heading__wrapper
-    .heading {{ 'BRIDE & GROOM' }}
+    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'BRIDE & GROOM' }}
   .kv
-    .kv__main {{ 'So let’s briefly introduce the “why” of marriage to set you up to make a wise choice about the “who.”\nA home established on Matthew 6:33—“Seek first the kingdom of God and His righteousness, and all these things shall be added to you” (NKJV)—\nis a glorious thing.' }}
-    .kv__sub {{ 'Gary Thomas on "The Sacred Search"' }}
+    .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
+    .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
   .biodata
-    .biodata__item
-      img.biodata__image(
-        loading="lazy"
-        src="~/assets/images/wedding/about-us/picture_groom.jpg"
-      )
-      .biodata__info
-        .biodata__name {{ 'DARIEN\nJONATHAN' }}
-        .biodata__parents
-          .biodata__parent {{ 'Second son of' }}
-          //- NOTE: &#xFE0E; is used to disable auto conversion to emoji in iOS
-          .biodata__parent {{ 'Pdt. Hasan Winata (&#x271D;&#xFE0E;) &' }}
-          .biodata__parent {{ 'Mrs. Heniwati Suwardi' }}
-    .biodata__item(data-order="reverse")
-      img.biodata__image(
-        loading="lazy"
-        src="~/assets/images/wedding/about-us/picture_bride.jpg"
-      )
-      .biodata__info
-        .biodata__name {{ 'DAISY\nCHRISTINA' }}
-        .biodata__parents
-          .biodata__parent {{ 'Second daughter of' }}
-          .biodata__parent {{ 'Mr. Sie Manule &' }}
-          .biodata__parent {{ 'Mrs. Wilyanti Tjahjana' }}
+    template(v-for="(person, index) in coupleWithDownloadedImages")
+      .biodata__item(:data-order="index % 2 !== 0 ? 'reverse' : ''")
+        img.biodata__image(
+          loading="lazy"
+          :src="person.imageSrc"
+        )
+        .biodata__info
+          .biodata__name {{ `${person.name.first}\n${person.name.last}`.toLocaleUpperCase() }}
+          .biodata__parents
+            .biodata__parent {{ getPersonBiodata(person) }}
 </template>
-✝ LATIN CROSS Unicode: U+271D, UTF-8: E2 9C 9D
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useStorage } from '~/composables/firebase/storage/useStorage'
+import type { Person, SectionSettings } from '~/types/model/wedding/weddingSettings'
+import { getOrdinal } from '~/utils/number'
+import type { Flatten } from '~/utils/types'
+
+const storage = useStorage()
+
+type Props = {
+  couple: [Person, Person]
+  sectionSettings: SectionSettings
+}
+
+const props = defineProps({
+  couple: {
+    type: [Object as () => Props['couple'], Object as () => Props['couple']],
+    required: true,
+  },
+  sectionSettings: {
+    type: Object as () => Props['sectionSettings'],
+    required: true,
+  },
+})
+
+/**
+ * Download Images
+ */
+
+const coupleWithDownloadedImages = ref<Props['couple']>()
+
+watch(
+  () => props.couple,
+  async couple => {
+    if (!couple) return
+
+    const [firstPerson, secondPerson] = couple
+
+    const [firstPersonImageSrc, secondPersonImageSrc] = await Promise.all([
+      storage.getDownloadURL(firstPerson.imageSrc),
+      storage.getDownloadURL(secondPerson.imageSrc),
+    ])
+
+    coupleWithDownloadedImages.value = [
+      {
+        ...firstPerson,
+        imageSrc: firstPersonImageSrc,
+      },
+      {
+        ...secondPerson,
+        imageSrc: secondPersonImageSrc,
+      },
+    ]
+  },
+  {
+    immediate: true,
+  }
+)
+
+const getParentName = (parent: Flatten<Person['parents']>) =>
+  parent.hasPassedAway ? `${parent.name} (✝︎)` : parent.name
+
+const getPersonBiodata = (person: Person) => {
+  const ordinal = getOrdinal(person.childOrder)
+  const childGender = person.gender === 'male' ? 'son' : 'daughter'
+  const parentNames = person.parents
+    .map(parent => {
+      if (!parent.hasPassedAway) return parent.name
+      /**
+       * &#x271D; is "cross" symbol
+       * &#xFE0E; is used to disable auto conversion to emoji in iOS
+       */
+      return `${parent.name} (✝︎)`
+    })
+    .join(' &\n')
+
+  return `${capitalizeFirstLetter(ordinal)} ${childGender} of\n${parentNames}`
+}
+</script>
 <script lang="ts">
 export default {
   name: 'AboutUs',

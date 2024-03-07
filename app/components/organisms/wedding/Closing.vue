@@ -1,10 +1,20 @@
 <template lang="pug">
 .closing
+  .heading__wrapper(v-if="sectionSettings.title")
+    .heading {{ sectionSettings.title }}
   .text
-    .text__main {{ 'For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast. For we are his workmanship, created in Christ Jesus for good works, which God prepared beforehand, that we should walk in them.' }}
-    .text__sub {{ 'Ephesians 2:8-10 (ESV)' }}
+    .text__main {{ sectionSettings.description.main }}
+    .text__sub {{ sectionSettings.description.sub }}
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import type { SectionSettings } from '~/types/model/wedding/weddingSettings'
+
+type Props = {
+  sectionSettings: SectionSettings
+}
+
+defineProps<Props>()
+</script>
 <script lang="ts">
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -18,6 +28,24 @@ export default {
   margin: 0 auto;
   @include pc {
     max-width: 1200px;
+  }
+}
+
+.heading {
+  &__wrapper {
+    margin-bottom: 60px;
+  }
+
+  & {
+    @include font-family('marcellus');
+    text-align: center;
+    margin-bottom: 20px;
+    @include pc {
+      @include font($size: $font-xxhuge, $letter-spacing: 2px);
+    }
+    @include sp {
+      @include font($size: $font-xhuge, $letter-spacing: 2px);
+    }
   }
 }
 

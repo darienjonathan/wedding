@@ -1,33 +1,28 @@
 <template lang="pug">
 .registry
   .heading__wrapper
-    .heading {{ 'REGISTRY' }}
+    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'REGISTRY' }}
   .kv
-    .kv__main {{ 'Your presence, prayer, and wishes are enough for a present to us.' }}
-    .kv__sub {{ 'However, for you who wish to take further steps to support our new family, please check out below:' }}
-  .account
-    .account__item.account__item--jp.item
-      .item__label {{ '金融機関名' }}
-      .item__value {{ '三菱UFJ銀行' }}
-      .item__label {{ '支店名' }}
-      .item__value {{ '鎌倉支店' }}
-      .item__label {{ '口座番号' }}
-      .item__value {{ '0177989' }}
-      .item__label {{ '口座の種類' }}
-      .item__value {{ '普通' }}
-      .item__label {{ '口座名義' }}
-      .item__value {{ 'ダリエン ジョナサン' }}
-    .account__item.item
-      .item__label {{ 'Bank Name' }}
-      .item__value {{ 'BCA' }}
-      .item__label {{ 'SWIFT Code' }}
-      .item__value {{ 'CENAIDJA' }}
-      .item__label {{ 'Account Number' }}
-      .item__value {{ '2301915251' }}
-      .item__label {{ 'Account Holder\'s Name' }}
-      .item__value {{ 'Daisy Christina' }}
+    .kv__main {{ sectionSettings.description.main }}
+    .kv__sub {{ sectionSettings.description.sub }}
+  .account__wrapper
+    .account
+      template(v-for="registry in registries")
+        .account__item.item
+          template(v-for="[label, value] in Object.entries(registry)")
+            .item__label {{ label }}
+            .item__value {{ value }}
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import type { Registry, SectionSettings } from '~/types/model/wedding/weddingSettings'
+
+type Props = {
+  registries: Registry[]
+  sectionSettings: SectionSettings
+}
+
+defineProps<Props>()
+</script>
 <script lang="ts">
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -91,17 +86,21 @@ export default {
 }
 
 .account {
-  display: grid;
-  margin: 0 auto;
-
-  @include pc {
-    grid-template-columns: 1fr 1fr;
-    gap: 0 100px;
-    max-width: 800px;
+  &__wrapper {
+    @include flex;
   }
 
-  @include sp {
-    gap: 40px 0;
+  & {
+    @include flex;
+
+    @include pc {
+      @include flex-gap(100px, 40px);
+      max-width: 800px;
+    }
+
+    @include sp {
+      @include flex-gap(40px, 40px);
+    }
   }
 }
 

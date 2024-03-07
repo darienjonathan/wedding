@@ -11,3 +11,5 @@ export const asyncReplace = async (
   const replacements = await Promise.all(replacementPromises)
   return text.replace(regex, replacements.shift() as string)
 }
+
+export const capitalizeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)

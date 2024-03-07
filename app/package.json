@@ -9,6 +9,7 @@
     "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
+    "@nuxt/eslint-config": "^0.2.0",
     "@nuxtjs/eslint-config-typescript": "^7.0.2",
     "@pinia/nuxt": "^0.4.11",
     "@prettier/plugin-pug": "^1.17.3",
