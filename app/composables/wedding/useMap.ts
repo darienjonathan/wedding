@@ -1,3 +1,4 @@
+import { Library } from '@googlemaps/js-api-loader'
 import type { WeddingEvent } from 'types/model/wedding/weddingSettings'
 import useGoogleMaps from '~/composables/useMap'
 
@@ -14,7 +15,8 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
       const weddingEvent = weddingEvents.value[index]
       if (!weddingEvent) return
 
-      loader.value.importLibrary('core').then(() => {
+      const gmapsLibraries: Library[] = ['maps', 'marker']
+      Promise.all(gmapsLibraries.map(loader.value.importLibrary)).then(() => {
         const position = weddingEvent.centerCoordinate
 
         const infoWindowContent = `
@@ -36,7 +38,7 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
           },
           mapId: '67c94aa1464993bf',
         })
-        const marker = new google.maps.Marker({
+        const marker = new google.maps.marker.AdvancedMarkerElement({
           position,
           map,
         })
