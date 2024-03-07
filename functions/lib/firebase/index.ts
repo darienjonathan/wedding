@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
 
 const adminInstance = admin.initializeApp({
-  storageBucket: 'darienjonathan-site.appspot.com',
+  storageBucket: 'wedding-5c92d',
 })
 
 export default adminInstance

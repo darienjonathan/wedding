@@ -49,7 +49,7 @@
           .line
           Closing.closing(:sectionSettings="weddingSettings.sectionSettings.closing")
         Footer.footer(:type="'default'")
-  template(v-if="isDataLoaded && invitee && weddingSettings?.rsvp.isEnabled")
+  template(v-if="isInviteeDataLoaded && invitee && weddingSettings?.rsvp.isEnabled")
     RSVP(
       :tenantId="tenantId"
       :isRSVPModalOpen="isRSVPModalOpen"
@@ -80,81 +80,59 @@ import Wishes from '~~/components/organisms/wedding/Wishes.vue'
 import useUid from '~~/composables/wedding/useUid'
 
 const tenantId = useTenant()
-
 useProvideLoading('wedding')
-
-const isMounted = ref(false)
-const isHeroImageLoaded = ref(false)
-const isLoading = computed(() => !isMounted.value || !isHeroImageLoaded.value)
-
-onMounted(() => {
-  isMounted.value = true
-})
-
-const handleLoadingDone = () => {
-  isHeroImageLoaded.value = true
-}
-
-const eventsElementRef = ref<InstanceType<typeof Events> | null>()
-const handleNavClick = () => {
-  if (!eventsElementRef.value) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const element = eventsElementRef.value.$el as HTMLElement
-  const eventsTop = element.getBoundingClientRect().top
-  scrollTo(0, eventsTop)
-}
 
 // --------------------------------------------------
 // User Data
 // --------------------------------------------------
 
 const { uid } = useUid()
-const {
-  useWeddingSettings: useWeddingSettingsFirestore,
-  useInvitees,
-  useInviteeRSVP,
-} = useFirestoreCollections()
-const weddingSettingsFirestore = useWeddingSettingsFirestore(tenantId)
+const { useInvitees, useInviteeRSVP } = useFirestoreCollections()
+
 const inviteesFirestore = useInvitees(tenantId)
 const inviteeRSVPFirestore = useInviteeRSVP(tenantId)
-
-const isDataLoaded = ref(false)
-const weddingSettings = ref<WeddingSettings | null>(null)
-const invitee = ref<Invitee | null>(null)
-const inviteeRSVP = ref<InviteeRSVP | null>(null)
-
-const setInvitee = async () => {
-  if (!uid.value) return
-  const fetchedInvitee = await inviteesFirestore.loadDocument(uid.value)
-  invitee.value = fetchedInvitee
-}
-
-const setInviteeRSVP = async () => {
-  if (!uid.value) return
-  const fetchedInviteeRSVP = await inviteeRSVPFirestore.loadDocument(uid.value)
-  inviteeRSVP.value = fetchedInviteeRSVP
-}
-
-const setWeddingSettings = async () => {
-  weddingSettings.value = await weddingSettingsFirestore.loadDocument(
-    WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID
-  )
-}
-
-watch(
-  uid,
-  async () => {
-    await Promise.all([setInvitee(), setInviteeRSVP(), setWeddingSettings()])
-    isDataLoaded.value = true
-  },
+const { data: invitee, status: inviteeFetchStatus } = await useAsyncData<Invitee | null>(
+  () => inviteesFirestore.loadDocument(uid.value),
   {
-    immediate: true,
+    watch: [uid],
+    server: false,
   }
+)
+const {
+  data: inviteeRSVP,
+  status: inviteeRSVPFetchStatus,
+  refresh: refreshInviteeRSVP,
+} = await useAsyncData<InviteeRSVP | null>(() => inviteeRSVPFirestore.loadDocument(uid.value), {
+  watch: [uid],
+  server: false,
+})
+
+const isInviteeDataLoaded = computed(
+  () => inviteeFetchStatus.value === 'success' && inviteeRSVPFetchStatus.value === 'success'
 )
 
 // --------------------------------------------------
 // Wedding Settings
 // --------------------------------------------------
+
+const router = useRouter()
+
+const { data: weddingSettings, status: weddingSettingsFetchStatus } =
+  await useFetch<WeddingSettings>('/api/fetchWeddingSettings', {
+    query: { tenantId },
+  })
+
+watch(
+  [weddingSettingsFetchStatus],
+  () => {
+    if (weddingSettingsFetchStatus.value === 'error') {
+      router.replace('/404')
+    }
+  },
+  {
+    immediate: true,
+  }
+)
 
 const {
   isEventSectionShown,
@@ -173,7 +151,7 @@ const {
 const isRSVPModalOpen = ref(false)
 
 const handleUpdateInviteRSVP = () => {
-  setInviteeRSVP()
+  refreshInviteeRSVP()
 }
 
 // --------------------------------------------------
@@ -197,6 +175,31 @@ watch(
     immediate: true,
   }
 )
+
+// --------------------------------------------------
+// Client Side
+// --------------------------------------------------
+
+const isMounted = ref(false)
+const isHeroImageLoaded = ref(false)
+const isLoading = computed(() => !isMounted.value || !isHeroImageLoaded.value)
+
+onMounted(() => {
+  isMounted.value = true
+})
+
+const handleLoadingDone = () => {
+  isHeroImageLoaded.value = true
+}
+
+const eventsElementRef = ref<InstanceType<typeof Events> | null>()
+const handleNavClick = () => {
+  if (!eventsElementRef.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const element = eventsElementRef.value.$el as HTMLElement
+  const eventsTop = element.getBoundingClientRect().top
+  scrollTo(0, eventsTop)
+}
 
 // --------------------------------------------------
 // Meta Tags

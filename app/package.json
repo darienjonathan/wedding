@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "copy-types": "sh sh/copyTypes.sh",
-    "dev": "nuxi dev",
+    "dev": "nuxi dev --dotenv .env.local",
     "build": "nuxi build && yarn copy-types",
     "build:firebase": "NITRO_PRESET=firebase yarn build",
     "deploy:firebase": "yarn build:firebase && firebase deploy --only hosting,functions",
