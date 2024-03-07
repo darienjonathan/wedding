@@ -21,8 +21,6 @@ export default defineEventHandler(async event => {
 
   const { data } = await response.json()
 
-  console.log(data)
-
   if (!data) {
     throw createError({
       statusCode: 404,
