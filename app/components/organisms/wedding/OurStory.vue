@@ -11,9 +11,10 @@
         @click="handleStoryClick(index)"
         :style="{ cursor: isStorySelectable(story) ? 'pointer' : 'auto' }"
       )
-        img.story__thumbnail(
-          loading="lazy"
+        NuxtImg.story__thumbnail(
+          :v-if="story.picture"
           :src="story.picture"
+          loading="lazy"
         )
         .story__content.content
           .content__title {{ `${index + 1}. ${story.title}` }}

@@ -18,7 +18,7 @@
           :data-order="imageState.order"
           @click="handleSelectImage(imageState)"
         )
-          img(
+          NuxtImg(
             ref="imgRefs"
             :src="imageState.src"
             loading="lazy"
@@ -33,7 +33,8 @@
       :height="selectedImage.height"
       @close="handleCloseModal"
     )
-      img.modal__img(
+      NuxtImg.modal__img(
+        v-if="selectedImage.src"
         :src="selectedImage.src"
         loading="lazy"
       )

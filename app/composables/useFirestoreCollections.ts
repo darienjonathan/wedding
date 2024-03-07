@@ -11,8 +11,6 @@ import {
 export const WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID = 'WEDDING_SETTINGS_VALUE'
 
 const useFirestoreCollections = () => {
-  const useWeddingSettings = (tenantId: string) =>
-    useFirestore<WeddingSettings>(`wedding/${tenantId}/weddingSettings`, parseWeddingSettings)
   const useInvitees = (tenantId: string) =>
     useFirestore<Invitee>(`wedding/${tenantId}/invitees`, parseInvitee)
   const useInviteeRSVP = (tenantId: string) =>
@@ -21,7 +19,6 @@ const useFirestoreCollections = () => {
     useFirestore<Wish>(`wedding/${tenantId}/wishes`, parseWish)
 
   return {
-    useWeddingSettings,
     useInvitees,
     useInviteeRSVP,
     useWishes,

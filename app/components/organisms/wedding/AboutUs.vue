@@ -8,9 +8,10 @@
   .biodata
     template(v-for="(person, index) in coupleWithDownloadedImages")
       .biodata__item(:data-order="index % 2 !== 0 ? 'reverse' : ''")
-        img.biodata__image(
-          loading="lazy"
+        NuxtImg.biodata__image(
+          v-if="person.imageSrc"
           :src="person.imageSrc"
+          loading="lazy"
         )
         .biodata__info
           .biodata__name {{ `${person.name.first}\n${person.name.last}`.toLocaleUpperCase() }}

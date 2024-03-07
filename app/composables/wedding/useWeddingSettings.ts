@@ -63,10 +63,9 @@ export const useWeddingSettings = (
 
   const isWishesSectionShown = computed(() => getIsSectionShown('wishes'))
 
-  const isRegistrySectionShown = computed(() => {
-    console.log(getIsSectionShown('registry'), JSON.parse(JSON.stringify(weddingSettings.value)))
-    return getIsSectionShown('registry') && weddingSettings.value?.registries.length
-  })
+  const isRegistrySectionShown = computed(
+    () => getIsSectionShown('registry') && weddingSettings.value?.registries.length
+  )
 
   const isClosingSectionShown = computed(() => getIsSectionShown('closing'))
 

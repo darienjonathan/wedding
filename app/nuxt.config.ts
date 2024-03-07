@@ -1,8 +1,11 @@
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
-  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy'],
+  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy', '@nuxt/image'],
   build: {
     transpile: ['@googlemaps/js-api-loader'],
+  },
+  image: {
+    quality: 50,
   },
   app: {
     head: {
@@ -40,6 +43,7 @@ export default defineNuxtConfig({
       },
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
     },
+    functionsBaseURL: process.env.FIREBASE_FUNCTIONS_BASE_API_URL,
   },
   css: ['@/assets/css/global.scss'],
 })
