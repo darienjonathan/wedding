@@ -1,13 +1,8 @@
-const LOCAL_DOMAIN_NAME = 'subdomain.local-domain.com'
-
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
-  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy', '@nuxt/image'],
+  modules: ['@pinia/nuxt', '@nuxt/image'],
   build: {
     transpile: ['@googlemaps/js-api-loader'],
-  },
-  devServer: {
-    host: LOCAL_DOMAIN_NAME,
   },
   image: {
     quality: 50,
@@ -29,10 +24,6 @@ export default defineNuxtConfig({
         },
       ],
     },
-  },
-  multiTenancy: {
-    tenantDynamicRoute: 'site',
-    rootDomains: [`${LOCAL_DOMAIN_NAME}:3000`, 'localhost:3000'],
   },
   runtimeConfig: {
     public: {

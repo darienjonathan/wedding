@@ -1589,7 +1589,7 @@
   optionalDependencies:
     ipx "^2.1.0"
 
-"@nuxt/kit@3.10.3", "@nuxt/kit@^3.10.3", "@nuxt/kit@^3.6.2", "@nuxt/kit@^3.8.2", "@nuxt/kit@^3.9.1":
+"@nuxt/kit@3.10.3", "@nuxt/kit@^3.10.3", "@nuxt/kit@^3.8.2", "@nuxt/kit@^3.9.1":
   version "3.10.3"
   resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-3.10.3.tgz#911bc431d9b7541a7269e9e63333f70c8ecb5fd6"
   integrity sha512-PUjYB9Mvx0qD9H1QZBwwtY4fLlCLET+Mm9BVqUOtXCaGoXd6u6BE4e/dGFPk2UEKkIcDGrUMSbqkHYvsEuK9NQ==
@@ -7408,13 +7408,6 @@ nuxi@^3.10.1:
   integrity sha512-ZNt858+FOZDIiKKFJkXO7uJAnALytDdn1XbLgtZAqbtWNMayHbOnWcnxh+WSOE4H9uOi2+loWXEqKElmNWLgcQ==
   optionalDependencies:
     fsevents "~2.3.3"
-
-nuxt-multi-tenancy@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/nuxt-multi-tenancy/-/nuxt-multi-tenancy-1.0.2.tgz#4ea89e125d0e82b6cf5f4de4abe15f7e7210e25b"
-  integrity sha512-vkej40yTShXdN4iPigJU3iiyJfb5d3boMJhCs+r/y3RyRnpJE/RuZ/e1Rm2rvyRpaZlcCK4QbhX6UAJPNiMCwg==
-  dependencies:
-    "@nuxt/kit" "^3.6.2"
 
 nuxt@^3.10.3:
   version "3.10.3"

@@ -66,7 +66,6 @@ import Events from '~/components/organisms/wedding/Events.vue'
 import Hero from '~/components/organisms/wedding/Hero.vue'
 import RSVP from '~/components/organisms/wedding/RSVP.vue'
 import Registry from '~/components/organisms/wedding/Registry.vue'
-import { useProvideLoading } from '~/composables/dependencyInjection/useLoadingDependencyInjection'
 import { useStorage } from '~/composables/firebase/storage/useStorage'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
@@ -79,8 +78,10 @@ import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import Wishes from '~~/components/organisms/wedding/Wishes.vue'
 import useUid from '~~/composables/wedding/useUid'
 
-const tenantId = useTenant()
-useProvideLoading('wedding')
+const route = useRoute()
+const tenantId = Array.isArray(route.params.tenantId)
+  ? route.params.tenantId[0]
+  : route.params.tenantId
 
 // --------------------------------------------------
 // User Data

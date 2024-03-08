@@ -30,7 +30,6 @@
     "firebase-functions": "^4.0.2",
     "firebase-functions-test": "^2.4.0",
     "nuxt": "^3.10.3",
-    "nuxt-multi-tenancy": "^1.0.2",
     "pinia": "^2.1.6",
     "prettier": "^2.4.1",
     "pug": "^3.0.2",
