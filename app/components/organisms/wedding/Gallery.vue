@@ -337,7 +337,7 @@ export default {
   }
 }
 
-.grid[data-layout-type='custom'] .image {
+.grid[data-layout-type='masonry'] .image {
   @mixin image($grid-row-start, $grid-row-end, $grid-column-start, $grid-column-end) {
     grid-row-start: $grid-row-start;
     grid-row-end: $grid-row-end;
