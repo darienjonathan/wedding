@@ -283,7 +283,7 @@ export default {
     }
   }
 
-  &[data-layout-type='custom'] {
+  &[data-layout-type='masonry'] {
     @include pc {
       grid-template-rows: repeat(10, 1fr);
       grid-template-columns: repeat(9, 1fr);

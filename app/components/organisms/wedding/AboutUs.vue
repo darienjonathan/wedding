@@ -14,7 +14,7 @@
           loading="lazy"
         )
         .biodata__info
-          .biodata__name {{ `${person.name.first}\n${person.name.last}`.toLocaleUpperCase() }}
+          .biodata__name {{ getFormattedName(person) }}
           .biodata__parents
             .biodata__parent {{ getPersonBiodata(person) }}
 </template>
@@ -22,7 +22,6 @@
 import { useStorage } from '~/composables/firebase/storage/useStorage'
 import type { Person, SectionSettings } from '~/types/model/wedding/weddingSettings'
 import { getOrdinal } from '~/utils/number'
-import type { Flatten } from '~/utils/types'
 
 const storage = useStorage()
 
@@ -76,8 +75,12 @@ watch(
   }
 )
 
-const getParentName = (parent: Flatten<Person['parents']>) =>
-  parent.hasPassedAway ? `${parent.name} (✝︎)` : parent.name
+const getFormattedName = (person: Person) => {
+  const { prefix, first, last, suffix } = person.name
+  const firstLine = [prefix, first.toLocaleUpperCase()].filter(v => v).join(' ')
+  const secondLine = [last.toLocaleUpperCase(), suffix].filter(v => v).join(', ')
+  return [firstLine, secondLine].filter(v => v).join(' ')
+}
 
 const getPersonBiodata = (person: Person) => {
   const ordinal = getOrdinal(person.childOrder)
@@ -85,10 +88,6 @@ const getPersonBiodata = (person: Person) => {
   const parentNames = person.parents
     .map(parent => {
       if (!parent.hasPassedAway) return parent.name
-      /**
-       * &#x271D; is "cross" symbol
-       * &#xFE0E; is used to disable auto conversion to emoji in iOS
-       */
       return `${parent.name} (✝︎)`
     })
     .join(' &\n')
@@ -160,31 +159,35 @@ export default {
 
 .biodata {
   & {
-    @include flex($justify: space-evenly);
     max-width: 1200px;
     margin: 0 auto 60px;
+    @include pc {
+      @include flex($justify: space-evenly);
+    }
   }
 
   &__item {
-    width: 50%;
     @include pc {
       @include flex;
-      &[data-order='reverse'] {
-        flex-direction: row-reverse;
+      @include flex-gap(30px);
+      width: 50%;
+    }
+
+    @include sp {
+      @include flex($justify: space-around);
+      @include flex-gap(15px);
+      &:not(:last-child) {
+        margin-bottom: 30px;
       }
+    }
+
+    &[data-order='reverse'] {
+      flex-direction: row-reverse;
     }
   }
 
   &__image {
-    @include sp {
-      width: 100%;
-      margin-bottom: 16px;
-      padding: 0 30px;
-    }
-    @include pc {
-      width: 40%;
-      padding: 0 30px;
-    }
+    width: 40%;
   }
 
   &__info {
