@@ -6,6 +6,7 @@ import {
 import { getSheetRows, getSheets, parseCellValue } from '~/lib/google-sheets'
 import { onRequest } from 'firebase-functions/v2/https'
 import FirestoreCollection from '~/lib/firebase/firestore/Firestore'
+import { defaultSettings } from '~/lib/firebase/functions'
 
 const inviteePropertyIndexes: ('uid' | keyof Invitee)[] = [
   'uid',
@@ -103,7 +104,7 @@ const syncSpreadsheetToFirestore = async <T extends Record<string, any>>(
   await firestoreInstance.bulkInsertMap(spreadsheetMap)
 }
 
-export const sync = onRequest(async (req, res) => {
+export const sync = onRequest({ region: defaultSettings.region }, async (req, res) => {
   const tenantId = req.query.tenantId as string
 
   if (!tenantId) {
