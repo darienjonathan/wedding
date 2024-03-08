@@ -1,8 +1,14 @@
-import { inviteeRSVP } from '~/lib/firebase/firestore/collections'
+import FirestoreTrigger from '~/lib/firebase/firestore/FirestoreTrigger'
 import { getSheetRows, getSheets, batchUpdate } from '~/lib/google-sheets'
+import { parseInviteeRSVP } from '~/types/model/wedding/invitee'
+
+const inviteeRSVPTrigger = new FirestoreTrigger(
+  'wedding/{tenantId}/inviteeRSVP/{inviteeRSVPUid}',
+  parseInviteeRSVP
+)
 
 // on write, update spreadsheet's data
-export const onWrite = inviteeRSVP().trigger.onWrite(async (_, after, context) => {
+export const onWrite = inviteeRSVPTrigger.onWrite(async (_, after, context) => {
   const { inviteeRSVPUid } = context.params
 
   const sheets = await getSheets()

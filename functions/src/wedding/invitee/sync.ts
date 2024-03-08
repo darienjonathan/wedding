@@ -103,9 +103,16 @@ const syncSpreadsheetToFirestore = async <T extends Record<string, any>>(
   await firestoreInstance.bulkInsertMap(spreadsheetMap)
 }
 
-export const sync = onRequest(async (_, res) => {
-  const inviteesFirestore = inviteesFirestoreFn()
-  const inviteeRSVPFirestore = inviteeRSVPFirestoreFn()
+export const sync = onRequest(async (req, res) => {
+  const tenantId = req.query.tenantId as string
+
+  if (!tenantId) {
+    res.end()
+    return
+  }
+
+  const inviteesFirestore = inviteesFirestoreFn(tenantId)
+  const inviteeRSVPFirestore = inviteeRSVPFirestoreFn(tenantId)
 
   const { inviteeMap: inviteeMapFromSpreadsheet, inviteeRSVPMap: inviteeRSVPMapFromSpreadsheet } =
     await getInviteeMapFromSpreadsheet()
