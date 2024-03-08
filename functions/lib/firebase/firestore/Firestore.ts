@@ -107,9 +107,9 @@ class FirestoreCollection<T extends Record<string, any>> {
     })
   }
 
-  public async loadDocument(id: string): Promise<T> {
+  public async loadDocument(id: string): Promise<T | null> {
     const snapshot = await this.getDocumentRef(id).get()
-    const data = this.parse(snapshot.data() || {})
+    const data = snapshot.exists ? this.parse(snapshot.data() || {}) : null
     return data
   }
 
@@ -133,9 +133,7 @@ class FirestoreCollection<T extends Record<string, any>> {
 
   public subscribeDocument(id: string, fn: (data: T | null) => void) {
     return this.ref.doc(id).onSnapshot(querySnapshot => {
-      const data = querySnapshot.exists
-        ? this.parse(querySnapshot.data() as FirebaseFirestore.DocumentData)
-        : null
+      const data = querySnapshot.exists ? this.parse(querySnapshot.data() || {}) : null
       fn(data)
     })
   }

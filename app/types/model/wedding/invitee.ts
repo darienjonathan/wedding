@@ -56,7 +56,7 @@ export interface Invitee {
   childrenGuestNumber: number
 }
 
-export const parseInvitee = (data: any): Invitee => ({
+export const parseInvitee = (data: any = {}): Invitee => ({
   databaseName: parseString(data.databaseName),
   invitationType: parseInvitationType(data.invitationType),
   inviteePrefix: parseInviteePrefix(data.inviteePrefix),
@@ -74,7 +74,7 @@ export interface InviteeRSVP {
   childrenGuestNumber: number
 }
 
-export const parseInviteeRSVP = (data: any): InviteeRSVP => ({
+export const parseInviteeRSVP = (data: any = {}): InviteeRSVP => ({
   name: parseString(data.name),
   isAttendingReception: parseBoolean(data.isAttendingReception),
   phoneNumber: parseString(data.phoneNumber),
