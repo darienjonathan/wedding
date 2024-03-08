@@ -21,12 +21,5 @@ export default defineEventHandler(async event => {
 
   const { data } = await response.json()
 
-  if (!data) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'tenantId does not exist',
-    })
-  }
-
   return data
 })

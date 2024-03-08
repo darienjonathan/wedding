@@ -124,7 +124,13 @@ watch(
   [weddingSettingsFetchStatus],
   () => {
     if (weddingSettingsFetchStatus.value === 'error') {
-      navigateTo('404')
+      throw createError({
+        fatal: true,
+        statusCode: 404,
+        statusMessage: 'Invitation Page Not Found',
+        message:
+          "We hope that is not also the case regarding your partner (if you're looking for one, though).",
+      })
     }
   },
   {

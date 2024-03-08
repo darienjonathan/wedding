@@ -1,10 +1,17 @@
 <template lang="pug">
 .wrapper
   .error
-    .error__text.-heading 404: Page Not Found.
-    .error__text.-subheading We hope that is not also the case regarding your partner (if you're looking for one, though).
+    .error__text.-heading {{ `${error?.statusCode}: ${error?.statusMessage}` }}
+    .error__text.-subheading {{ error?.message || error?.cause }}
 </template>
-<script>
+<script lang="ts" setup>
+import type { NuxtError } from '#app'
+
+defineProps({
+  error: Object as () => NuxtError,
+})
+</script>
+<script lang="ts">
 definePageMeta({
   layout: 'base',
 })
