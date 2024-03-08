@@ -1,4 +1,5 @@
-import { QueryValue } from 'ufo'
+import type { QueryValue } from 'ufo'
+import { createEndpoint } from '~/utils/api'
 
 const parseSearchParams = (searchParam: QueryValue): string => {
   if (!searchParam) return ''
@@ -9,7 +10,7 @@ const parseSearchParams = (searchParam: QueryValue): string => {
 
 export default defineEventHandler(async event => {
   const config = useRuntimeConfig()
-  const url = `${config.functionsBaseURL}/fetchWeddingSettings`
+  const url = createEndpoint(config.functionsBaseURL, 'fetchWeddingSettings')
 
   const query = await getQuery(event)
   const tenantId = parseSearchParams(query.tenantId)
