@@ -27,7 +27,6 @@ export default defineEventHandler(async event => {
       statusCode: 404,
       statusMessage: 'tenantId does not exist',
     })
-    return
   }
 
   return data

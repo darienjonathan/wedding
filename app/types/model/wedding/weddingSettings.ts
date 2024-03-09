@@ -124,6 +124,7 @@ export const parseFooter = (data: any = {}): Footer => ({
 
 export type Hero = {
   imageSrc: string
+  invitationText: string
   tagline: {
     jp: string
     en: string
@@ -133,6 +134,7 @@ export type Hero = {
 
 export const parseHero = (data: any = {}): Hero => ({
   imageSrc: parseString(data.imageSrc),
+  invitationText: parseString(data.invitationText),
   tagline: {
     jp: parseString(data.tagline?.jp),
     en: parseString(data.tagline?.en),

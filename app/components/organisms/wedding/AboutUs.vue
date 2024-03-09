@@ -159,38 +159,38 @@ export default {
 
 .biodata {
   & {
+    display: grid;
     max-width: 1200px;
     margin: 0 auto 60px;
     @include pc {
-      @include flex($justify: space-evenly);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0 50px;
+    }
+    @include sp {
+      grid-template-rows: repeat(2, 1fr);
+      gap: 30px 0;
     }
   }
 
   &__item {
-    @include pc {
-      @include flex;
-      @include flex-gap(30px);
-      width: 50%;
-    }
-
-    @include sp {
-      @include flex($justify: space-around);
-      @include flex-gap(15px);
-      &:not(:last-child) {
-        margin-bottom: 30px;
-      }
-    }
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: 'image info';
+    align-items: center;
+    gap: 10px;
 
     &[data-order='reverse'] {
-      flex-direction: row-reverse;
+      grid-template-areas: 'info image';
     }
   }
 
   &__image {
-    width: 40%;
+    grid-area: image;
+    width: 100%;
   }
 
   &__info {
+    grid-area: info;
     text-align: center;
   }
 

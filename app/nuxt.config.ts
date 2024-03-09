@@ -48,6 +48,7 @@ export default defineNuxtConfig({
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
     },
     functionsBaseURL: process.env.FIREBASE_FUNCTIONS_BASE_API_URL,
+    baseURL: process.env.BASE_URL,
   },
   css: ['@/assets/css/global.scss'],
 })

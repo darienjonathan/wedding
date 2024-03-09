@@ -10,10 +10,10 @@
       :src="heroImageSrc"
       @load="$emit('loadingDone')"
     )
-    template(v-if="!isNotInvited")
-      .hero__invitation-text.invitation-text
-        .invitation-text__type {{ invitationTypeText }}
-        .invitation-text__name {{ inviteeNameText }}
+    .hero__invitation-text.invitation-text
+      template(v-if="!isNotInvited")
+        .invitation-text__item {{ inviteeNameText }}
+      .invitation-text__item {{ weddingSettings?.hero.invitationText }}
     .hero__kv.kv
       template(v-if="weddingSettings?.hero.tagline.jp")
         .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
@@ -80,12 +80,6 @@ const { isReceptionInvitation, isMatrimonyInvitation, isNotInvited, canRSVP, can
     computed(() => props.weddingSettings?.rsvp || null)
   )
 
-const invitationTypeText = computed(() => {
-  if (isReceptionInvitation.value) return 'Holy Matrimony & Wedding Reception Invitation'
-  if (isMatrimonyInvitation.value) return 'Holy Matrimony Invitation'
-  return ''
-})
-
 const inviteeName = computed(() => props.inviteeRSVP?.name || props.invitee?.databaseName || '')
 
 const inviteeNameText = computed(() => {
@@ -97,7 +91,7 @@ const inviteeNameText = computed(() => {
       : props.invitee?.inviteeSuffix === 'partner'
       ? ' & Partner'
       : ''
-  return `For ${inviteePrefix}${inviteeName.value}${inviteeSuffix}`
+  return `Dear ${inviteePrefix}${inviteeName.value}${inviteeSuffix},`
 })
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
@@ -305,8 +299,8 @@ export default {
 }
 
 .invitation-text {
-  &__type {
-    margin-bottom: 4px;
+  * + * {
+    margin-top: 4px;
   }
 }
 
