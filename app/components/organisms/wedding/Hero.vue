@@ -6,14 +6,14 @@
     .hero__intersection-observer(ref="observerElementRef")
   .hero__content(:data-is-blur="isBlur")
     NuxtImg.hero__image(
-      v-if="heroImageSrc"
-      :src="heroImageSrc"
+      v-if="weddingSettings?.hero.imageSrc"
+      :src="weddingSettings?.hero.imageSrc"
       @load="$emit('loadingDone')"
     )
-    template(v-if="!isNotInvited")
-      .hero__invitation-text.invitation-text
-        .invitation-text__type {{ invitationTypeText }}
-        .invitation-text__name {{ inviteeNameText }}
+    .hero__invitation-text.invitation-text
+      template(v-if="!isNotInvited")
+        .invitation-text__item {{ inviteeNameText }}
+      .invitation-text__item {{ weddingSettings?.hero.invitationText }}
     .hero__kv.kv
       template(v-if="weddingSettings?.hero.tagline.jp")
         .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
@@ -45,7 +45,6 @@
       .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
 </template>
 <script lang="ts" setup>
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import { useInvitee } from '~/composables/wedding/useInvitee'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
@@ -80,12 +79,6 @@ const { isReceptionInvitation, isMatrimonyInvitation, isNotInvited, canRSVP, can
     computed(() => props.weddingSettings?.rsvp || null)
   )
 
-const invitationTypeText = computed(() => {
-  if (isReceptionInvitation.value) return 'Holy Matrimony & Wedding Reception Invitation'
-  if (isMatrimonyInvitation.value) return 'Holy Matrimony Invitation'
-  return ''
-})
-
 const inviteeName = computed(() => props.inviteeRSVP?.name || props.invitee?.databaseName || '')
 
 const inviteeNameText = computed(() => {
@@ -97,30 +90,10 @@ const inviteeNameText = computed(() => {
       : props.invitee?.inviteeSuffix === 'partner'
       ? ' & Partner'
       : ''
-  return `For ${inviteePrefix}${inviteeName.value}${inviteeSuffix}`
+  return `Dear ${inviteePrefix}${inviteeName.value}${inviteeSuffix},`
 })
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
-
-// --------------------------------------------------
-// Hero Image
-// --------------------------------------------------
-
-const storage = useStorage()
-
-const heroImageSrc = ref('')
-
-watch(
-  () => props.weddingSettings,
-  async settings => {
-    if (!settings) return
-
-    heroImageSrc.value = await storage.getDownloadURL(settings?.hero.imageSrc)
-  },
-  {
-    immediate: true,
-  }
-)
 
 // --------------------------------------------------
 // Hero Intersection Observer
@@ -305,8 +278,8 @@ export default {
 }
 
 .invitation-text {
-  &__type {
-    margin-bottom: 4px;
+  * + * {
+    margin-top: 4px;
   }
 }
 

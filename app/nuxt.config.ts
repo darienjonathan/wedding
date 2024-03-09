@@ -1,11 +1,19 @@
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
-  modules: ['@pinia/nuxt', 'nuxt-multi-tenancy', '@nuxt/image'],
+  modules: ['@pinia/nuxt', '@nuxt/image'],
   build: {
     transpile: ['@googlemaps/js-api-loader'],
   },
   image: {
     quality: 50,
+  },
+  nitro: {
+    firebase: {
+      gen: 2,
+      httpsOptions: {
+        region: 'asia-southeast2',
+      },
+    },
   },
   app: {
     head: {
@@ -16,10 +24,6 @@ export default defineNuxtConfig({
         },
       ],
     },
-  },
-  multiTenancy: {
-    tenantDynamicRoute: 'site',
-    rootDomains: ['localhost:3000'],
   },
   runtimeConfig: {
     public: {
@@ -44,6 +48,7 @@ export default defineNuxtConfig({
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
     },
     functionsBaseURL: process.env.FIREBASE_FUNCTIONS_BASE_API_URL,
+    baseURL: process.env.BASE_URL,
   },
   css: ['@/assets/css/global.scss'],
 })

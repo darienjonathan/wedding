@@ -6,7 +6,7 @@
     .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
     .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
   .biodata
-    template(v-for="(person, index) in coupleWithDownloadedImages")
+    template(v-for="(person, index) in couple")
       .biodata__item(:data-order="index % 2 !== 0 ? 'reverse' : ''")
         NuxtImg.biodata__image(
           v-if="person.imageSrc"
@@ -14,17 +14,13 @@
           loading="lazy"
         )
         .biodata__info
-          .biodata__name {{ `${person.name.first}\n${person.name.last}`.toLocaleUpperCase() }}
+          .biodata__name {{ getFormattedName(person) }}
           .biodata__parents
             .biodata__parent {{ getPersonBiodata(person) }}
 </template>
 <script lang="ts" setup>
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import type { Person, SectionSettings } from '~/types/model/wedding/weddingSettings'
 import { getOrdinal } from '~/utils/number'
-import type { Flatten } from '~/utils/types'
-
-const storage = useStorage()
 
 type Props = {
   couple: [Person, Person]
@@ -46,38 +42,12 @@ const props = defineProps({
  * Download Images
  */
 
-const coupleWithDownloadedImages = ref<Props['couple']>()
-
-watch(
-  () => props.couple,
-  async couple => {
-    if (!couple) return
-
-    const [firstPerson, secondPerson] = couple
-
-    const [firstPersonImageSrc, secondPersonImageSrc] = await Promise.all([
-      storage.getDownloadURL(firstPerson.imageSrc),
-      storage.getDownloadURL(secondPerson.imageSrc),
-    ])
-
-    coupleWithDownloadedImages.value = [
-      {
-        ...firstPerson,
-        imageSrc: firstPersonImageSrc,
-      },
-      {
-        ...secondPerson,
-        imageSrc: secondPersonImageSrc,
-      },
-    ]
-  },
-  {
-    immediate: true,
-  }
-)
-
-const getParentName = (parent: Flatten<Person['parents']>) =>
-  parent.hasPassedAway ? `${parent.name} (✝︎)` : parent.name
+const getFormattedName = (person: Person) => {
+  const { prefix, first, last, suffix } = person.name
+  const firstLine = [prefix, first.toLocaleUpperCase()].filter(v => v).join(' ')
+  const secondLine = [last.toLocaleUpperCase(), suffix].filter(v => v).join(', ')
+  return [firstLine, secondLine].filter(v => v).join(' ')
+}
 
 const getPersonBiodata = (person: Person) => {
   const ordinal = getOrdinal(person.childOrder)
@@ -85,10 +55,6 @@ const getPersonBiodata = (person: Person) => {
   const parentNames = person.parents
     .map(parent => {
       if (!parent.hasPassedAway) return parent.name
-      /**
-       * &#x271D; is "cross" symbol
-       * &#xFE0E; is used to disable auto conversion to emoji in iOS
-       */
       return `${parent.name} (✝︎)`
     })
     .join(' &\n')
@@ -160,34 +126,38 @@ export default {
 
 .biodata {
   & {
-    @include flex($justify: space-evenly);
+    display: grid;
     max-width: 1200px;
     margin: 0 auto 60px;
+    @include pc {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0 50px;
+    }
+    @include sp {
+      grid-template-rows: repeat(2, 1fr);
+      gap: 30px 0;
+    }
   }
 
   &__item {
-    width: 50%;
-    @include pc {
-      @include flex;
-      &[data-order='reverse'] {
-        flex-direction: row-reverse;
-      }
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: 'image info';
+    align-items: center;
+    gap: 10px;
+
+    &[data-order='reverse'] {
+      grid-template-areas: 'info image';
     }
   }
 
   &__image {
-    @include sp {
-      width: 100%;
-      margin-bottom: 16px;
-      padding: 0 30px;
-    }
-    @include pc {
-      width: 40%;
-      padding: 0 30px;
-    }
+    grid-area: image;
+    width: 100%;
   }
 
   &__info {
+    grid-area: info;
     text-align: center;
   }
 

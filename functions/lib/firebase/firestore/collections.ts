@@ -11,9 +11,17 @@ const weddingSettings = (tenantId: string) =>
     `wedding/${tenantId}/weddingSettings/{weddingSettingsUid}`,
     parseWeddingSettings
   )
-const invitees = () =>
-  new FirestoreWrapper<Invitee>('invitees', 'invitees/{inviteesUid}', parseInvitee)
-const inviteeRSVP = () =>
-  new FirestoreWrapper<InviteeRSVP>('inviteeRSVP', 'inviteeRSVP/{inviteeRSVPUid}', parseInviteeRSVP)
+const invitees = (tenantId: string) =>
+  new FirestoreWrapper<Invitee>(
+    `wedding/${tenantId}/invitees`,
+    `wedding/${tenantId}/invitees/{inviteesUid}`,
+    parseInvitee
+  )
+const inviteeRSVP = (tenantId: string) =>
+  new FirestoreWrapper<InviteeRSVP>(
+    `wedding/${tenantId}/inviteeRSVP`,
+    `wedding/${tenantId}/inviteeRSVP/{inviteeRSVPUid}`,
+    parseInviteeRSVP
+  )
 
 export { weddingSettings, invitees, inviteeRSVP }

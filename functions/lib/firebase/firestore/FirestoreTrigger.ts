@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions'
 import { QueryDocumentSnapshot, DocumentSnapshot } from 'firebase-functions/v1/firestore'
-import getFunctions from '~/lib/firebase/getFunctions'
+import { getFunctions } from '~/lib/firebase/functions'
 
 type ChangeCallbackFunction<T> = (
   before: T,

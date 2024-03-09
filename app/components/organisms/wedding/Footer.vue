@@ -52,6 +52,9 @@ $size: 20px;
     @include pc {
       grid-template-columns: repeat(2, auto);
     }
+    @include sp {
+      gap: 8px 0;
+    }
   }
 
   &__text,

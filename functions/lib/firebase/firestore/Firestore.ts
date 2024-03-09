@@ -1,12 +1,15 @@
-import adminInstance from '~/lib/firebase/index'
 import FirestoreQueryBuilder from '~/lib/firebase/firestore/FirestoreQueryBuilder'
 import FirestoreTrigger from '~/lib/firebase/firestore/FirestoreTrigger'
+import { appSingleton } from '~/lib/firebase'
+import { getFirestore } from 'firebase-admin/firestore'
+
+appSingleton()
 
 const BULK_MAX_SIZE = 500
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class FirestoreCollection<T extends Record<string, any>> {
-  private static readonly firestore: FirebaseFirestore.Firestore = adminInstance.firestore()
+  private static readonly firestore: FirebaseFirestore.Firestore = getFirestore()
   private path: string
   private _trigger: FirestoreTrigger<T>
   private parse: (data: FirebaseFirestore.DocumentData) => T
@@ -107,9 +110,9 @@ class FirestoreCollection<T extends Record<string, any>> {
     })
   }
 
-  public async loadDocument(id: string): Promise<T> {
+  public async loadDocument(id: string): Promise<T | null> {
     const snapshot = await this.getDocumentRef(id).get()
-    const data = this.parse(snapshot.data() || {})
+    const data = snapshot.exists ? this.parse(snapshot.data() || {}) : null
     return data
   }
 
@@ -133,9 +136,7 @@ class FirestoreCollection<T extends Record<string, any>> {
 
   public subscribeDocument(id: string, fn: (data: T | null) => void) {
     return this.ref.doc(id).onSnapshot(querySnapshot => {
-      const data = querySnapshot.exists
-        ? this.parse(querySnapshot.data() as FirebaseFirestore.DocumentData)
-        : null
+      const data = querySnapshot.exists ? this.parse(querySnapshot.data() || {}) : null
       fn(data)
     })
   }

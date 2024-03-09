@@ -15,45 +15,47 @@ class FirestoreQueryBuilder<T> {
   private limitArgs: BuildQueryArgs['limitArgs'] = 0
 
   public eq<K extends keyof T>(prop: K, val: T[K]): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), '==', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), '==', val)])
     return this
   }
 
   public gt<K extends keyof T>(prop: K, val: T[K]): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), '>', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), '>', val)])
     return this
   }
 
   public lt<K extends keyof T>(prop: K, val: T[K]): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), '<', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), '<', val)])
     return this
   }
 
   public gte<K extends keyof T>(prop: K, val: T[K]): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), '>=', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), '>=', val)])
     return this
   }
 
   public lte<K extends keyof T>(prop: K, val: T[K]): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), '<=', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), '<=', val)])
     return this
   }
 
   public contains<K extends keyof T>(prop: K, val: Unpacked<T[K]>): FirestoreQueryBuilder<T> {
-    this.whereArgsArr.push([prop.toString(), 'array-contains', val])
+    this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), 'array-contains', val)])
     return this
   }
 
   public in<K extends keyof T>(prop: K, val: Array<T[K]>): FirestoreQueryBuilder<T> {
     if (val.length > 0) {
-      this.whereArgsArr.push([prop.toString(), 'in', val])
+      this.whereArgsArr.push([admin.firestore.Filter.where(prop.toString(), 'in', val)])
     }
     return this
   }
 
   public inIds(val: string[]): FirestoreQueryBuilder<T> {
     if (val.length > 0) {
-      this.whereArgsArr.push([admin.firestore.FieldPath.documentId(), 'in', val])
+      this.whereArgsArr.push([
+        admin.firestore.Filter.where(admin.firestore.FieldPath.documentId(), 'in', val),
+      ])
     }
     return this
   }

@@ -9,7 +9,7 @@ export type Wish = {
   content: string
 }
 
-export const parseWish = (data: any): Wish => ({
+export const parseWish = (data: any = {}): Wish => ({
   name: parseString(data.name),
   timestamp: parseNumber(data.timestamp),
   content: parseString(data.content),

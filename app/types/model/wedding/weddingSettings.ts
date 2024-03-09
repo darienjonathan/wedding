@@ -25,7 +25,7 @@ export type WeddingEvent = {
   streamingLink: string
 }
 
-export const parseWeddingEvent = (data: any): WeddingEvent => ({
+export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
   type: parseInvitationType(data.type),
   eventName: parseString(data.eventName),
   venue: parseString(data.venue),
@@ -42,18 +42,20 @@ export const parseWeddingEvent = (data: any): WeddingEvent => ({
 
 export type Parent = {
   name: string
-  hasPassedAway: string
+  hasPassedAway: boolean
 }
 
-export const parseParent = (data: any): Parent => ({
+export const parseParent = (data: any = {}): Parent => ({
   name: parseString(data.name),
-  hasPassedAway: parseString(data.hasPassedAway),
+  hasPassedAway: parseBoolean(data.hasPassedAway),
 })
 
 export type Person = {
   name: {
+    prefix: string
     first: string
     last: string
+    suffix: string
   }
   gender: 'male' | 'female'
   childOrder: number
@@ -61,10 +63,12 @@ export type Person = {
   imageSrc: string
 }
 
-export const parsePerson = (data: any): Person => ({
+export const parsePerson = (data: any = {}): Person => ({
   name: {
+    prefix: parseString(data.name?.prefix),
     first: parseString(data.name?.first),
     last: parseString(data.name?.last),
+    suffix: parseString(data.name?.suffix),
   },
   gender: data.gender === 'male' ? 'male' : 'female',
   childOrder: parseNumber(data.childOrder),
@@ -78,7 +82,7 @@ export type RSVP = {
   deadlineTimestamp: number
 }
 
-export const parseRSVP = (data: any): RSVP => ({
+export const parseRSVP = (data: any = {}): RSVP => ({
   isEnabled: parseBoolean(data.isEnabled),
   masterSheet: parseString(data.masterSheet),
   deadlineTimestamp: parseNumber(data.deadlineTimestamp),
@@ -91,7 +95,7 @@ export type Story = {
   contents: string[]
 }
 
-export const parseStory = (data: any): Story => ({
+export const parseStory = (data: any = {}): Story => ({
   picture: parseString(data.picture),
   title: parseString(data.title),
   summary: parseString(data.summary),
@@ -99,12 +103,12 @@ export const parseStory = (data: any): Story => ({
 })
 
 export type Gallery = {
-  layoutType: 'default' | 'custom'
+  layoutType: 'default' | 'masonry'
   imageSrcs: string[]
 }
 
-export const parseGallery = (data: any): Gallery => ({
-  layoutType: data.layoutType === 'default' ? 'default' : 'custom',
+export const parseGallery = (data: any = {}): Gallery => ({
+  layoutType: data.layoutType === 'default' ? 'default' : 'masonry',
   imageSrcs: parseArray(data.imageSrcs, parseString),
 })
 
@@ -114,12 +118,13 @@ export type Footer = {
   type: 'default' | 'self'
 }
 
-export const parseFooter = (data: any): Footer => ({
+export const parseFooter = (data: any = {}): Footer => ({
   type: data.type === 'default' ? 'default' : 'self',
 })
 
 export type Hero = {
   imageSrc: string
+  invitationText: string
   tagline: {
     jp: string
     en: string
@@ -127,8 +132,9 @@ export type Hero = {
   title: string
 }
 
-export const parseHero = (data: any): Hero => ({
+export const parseHero = (data: any = {}): Hero => ({
   imageSrc: parseString(data.imageSrc),
+  invitationText: parseString(data.invitationText),
   tagline: {
     jp: parseString(data.tagline?.jp),
     en: parseString(data.tagline?.en),
@@ -146,7 +152,7 @@ export type SectionSettings = {
   }
 }
 
-export const parseSectionSettings = (data: any): SectionSettings => ({
+export const parseSectionSettings = (data: any = {}): SectionSettings => ({
   isEnabled: parseBoolean(data.isEnabled),
   title: parseString(data.title),
   isExclusiveToInvitees: parseBoolean(data.isExclusiveToInvitees),
@@ -177,7 +183,7 @@ export type WeddingSettings = {
   }
 }
 
-export const parseWeddingSettings = (data: any): WeddingSettings => ({
+export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   ogpImageSrc: parseString(data.ogpImageSrc),
   events: parseArray(data.events, parseWeddingEvent),
   couple: [parsePerson(data.couple?.[0]), parsePerson(data.couple?.[1])],

@@ -66,8 +66,6 @@ import Events from '~/components/organisms/wedding/Events.vue'
 import Hero from '~/components/organisms/wedding/Hero.vue'
 import RSVP from '~/components/organisms/wedding/RSVP.vue'
 import Registry from '~/components/organisms/wedding/Registry.vue'
-import { useProvideLoading } from '~/composables/dependencyInjection/useLoadingDependencyInjection'
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
@@ -79,8 +77,10 @@ import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import Wishes from '~~/components/organisms/wedding/Wishes.vue'
 import useUid from '~~/composables/wedding/useUid'
 
-const tenantId = useTenant()
-useProvideLoading('wedding')
+const route = useRoute()
+const tenantId = Array.isArray(route.params.tenantId)
+  ? route.params.tenantId[0]
+  : route.params.tenantId
 
 // --------------------------------------------------
 // User Data
@@ -115,8 +115,6 @@ const isInviteeDataLoaded = computed(
 // Wedding Settings
 // --------------------------------------------------
 
-const router = useRouter()
-
 const { data: weddingSettings, status: weddingSettingsFetchStatus } =
   await useFetch<WeddingSettings>('/api/fetchWeddingSettings', {
     query: { tenantId },
@@ -126,7 +124,10 @@ watch(
   [weddingSettingsFetchStatus],
   () => {
     if (weddingSettingsFetchStatus.value === 'error') {
-      router.replace('/404')
+      throw createError({
+        fatal: true,
+        statusCode: 404,
+      })
     }
   },
   {
@@ -153,28 +154,6 @@ const isRSVPModalOpen = ref(false)
 const handleUpdateInviteRSVP = () => {
   refreshInviteeRSVP()
 }
-
-// --------------------------------------------------
-// OGP
-// --------------------------------------------------
-
-const storage = useStorage('')
-
-const ogpImageSrc = ref('')
-const heroImageSrc = ref('')
-
-watch(
-  weddingSettings,
-  async settings => {
-    if (!settings) return
-
-    ogpImageSrc.value = await storage.getDownloadURL(settings.ogpImageSrc)
-    heroImageSrc.value = await storage.getDownloadURL(settings.hero?.imageSrc)
-  },
-  {
-    immediate: true,
-  }
-)
 
 // --------------------------------------------------
 // Client Side
@@ -205,23 +184,16 @@ const handleNavClick = () => {
 // Meta Tags
 // --------------------------------------------------
 
-// TODO: set base URL
-const DOMAIN = 'darienjonathan.com'
-const PROTOCOL = 'https://'
+const url = `${useRuntimeConfig().baseURL}/${tenantId}`
 
-const baseUrl = `${PROTOCOL}${DOMAIN}`
+const title = computed(() => `${weddingSettings?.value?.hero.title} | Wedding Invitation`)
 
-const url = `${PROTOCOL}${tenantId}/${DOMAIN}`
-
-const title = computed(
-  () =>
-    `${weddingSettings.value?.couple.map(c => c.name.first).join(' & ') || ''} | Wedding Invitation`
+const description = computed(
+  () => `${weddingSettings?.value?.hero.invitationText} | ${weddingSettings.value?.hero.title}`
 )
 
-const description = computed(() => title.value)
-
 const image = computed(
-  () => ogpImageSrc.value || heroImageSrc.value || `${baseUrl}/ogp-wedding.jpg`
+  () => weddingSettings.value?.ogpImageSrc || weddingSettings.value?.hero.imageSrc || ''
 )
 
 const meta = computed(() => {
