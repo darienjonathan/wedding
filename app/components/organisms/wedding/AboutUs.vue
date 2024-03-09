@@ -6,7 +6,7 @@
     .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
     .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
   .biodata
-    template(v-for="(person, index) in coupleWithDownloadedImages")
+    template(v-for="(person, index) in couple")
       .biodata__item(:data-order="index % 2 !== 0 ? 'reverse' : ''")
         NuxtImg.biodata__image(
           v-if="person.imageSrc"
@@ -19,11 +19,8 @@
             .biodata__parent {{ getPersonBiodata(person) }}
 </template>
 <script lang="ts" setup>
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import type { Person, SectionSettings } from '~/types/model/wedding/weddingSettings'
 import { getOrdinal } from '~/utils/number'
-
-const storage = useStorage()
 
 type Props = {
   couple: [Person, Person]
@@ -44,36 +41,6 @@ const props = defineProps({
 /**
  * Download Images
  */
-
-const coupleWithDownloadedImages = ref<Props['couple']>()
-
-watch(
-  () => props.couple,
-  async couple => {
-    if (!couple) return
-
-    const [firstPerson, secondPerson] = couple
-
-    const [firstPersonImageSrc, secondPersonImageSrc] = await Promise.all([
-      storage.getDownloadURL(firstPerson.imageSrc),
-      storage.getDownloadURL(secondPerson.imageSrc),
-    ])
-
-    coupleWithDownloadedImages.value = [
-      {
-        ...firstPerson,
-        imageSrc: firstPersonImageSrc,
-      },
-      {
-        ...secondPerson,
-        imageSrc: secondPersonImageSrc,
-      },
-    ]
-  },
-  {
-    immediate: true,
-  }
-)
 
 const getFormattedName = (person: Person) => {
   const { prefix, first, last, suffix } = person.name

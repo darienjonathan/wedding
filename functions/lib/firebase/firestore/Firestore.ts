@@ -1,12 +1,15 @@
-import adminInstance from '~/lib/firebase/index'
 import FirestoreQueryBuilder from '~/lib/firebase/firestore/FirestoreQueryBuilder'
 import FirestoreTrigger from '~/lib/firebase/firestore/FirestoreTrigger'
+import { appSingleton } from '~/lib/firebase'
+import { getFirestore } from 'firebase-admin/firestore'
+
+appSingleton()
 
 const BULK_MAX_SIZE = 500
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class FirestoreCollection<T extends Record<string, any>> {
-  private static readonly firestore: FirebaseFirestore.Firestore = adminInstance.firestore()
+  private static readonly firestore: FirebaseFirestore.Firestore = getFirestore()
   private path: string
   private _trigger: FirestoreTrigger<T>
   private parse: (data: FirebaseFirestore.DocumentData) => T

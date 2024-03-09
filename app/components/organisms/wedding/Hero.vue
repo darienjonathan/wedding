@@ -6,8 +6,8 @@
     .hero__intersection-observer(ref="observerElementRef")
   .hero__content(:data-is-blur="isBlur")
     NuxtImg.hero__image(
-      v-if="heroImageSrc"
-      :src="heroImageSrc"
+      v-if="weddingSettings?.hero.imageSrc"
+      :src="weddingSettings?.hero.imageSrc"
       @load="$emit('loadingDone')"
     )
     .hero__invitation-text.invitation-text
@@ -45,7 +45,6 @@
       .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
 </template>
 <script lang="ts" setup>
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import { useInvitee } from '~/composables/wedding/useInvitee'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
@@ -95,26 +94,6 @@ const inviteeNameText = computed(() => {
 })
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
-
-// --------------------------------------------------
-// Hero Image
-// --------------------------------------------------
-
-const storage = useStorage()
-
-const heroImageSrc = ref('')
-
-watch(
-  () => props.weddingSettings,
-  async settings => {
-    if (!settings) return
-
-    heroImageSrc.value = await storage.getDownloadURL(settings?.hero.imageSrc)
-  },
-  {
-    immediate: true,
-  }
-)
 
 // --------------------------------------------------
 // Hero Intersection Observer

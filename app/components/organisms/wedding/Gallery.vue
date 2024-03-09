@@ -42,7 +42,6 @@
 <script lang="ts" setup>
 import ALoading from '~/components/atoms/ALoading.vue'
 import AModal from '~/components/atoms/AModal.vue'
-import { useStorage } from '~/composables/firebase/storage/useStorage'
 import type { Gallery, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
 type ImageState = {
@@ -60,12 +59,6 @@ type Props = {
 
 const props = defineProps<Props>()
 
-/**
- * Download Images
- */
-
-const storage = useStorage('')
-
 const getInitialImageStates = (imageSrcs: string[]): ImageState[] =>
   imageSrcs.map((src, index) => ({
     src,
@@ -81,8 +74,7 @@ const imgRefs = ref<HTMLImageElement[]>([])
 watch(
   () => props.gallery,
   async gallery => {
-    const imageSrcs = await Promise.all(gallery.imageSrcs.map(storage.getDownloadURL))
-    imageStates.value = getInitialImageStates(imageSrcs)
+    imageStates.value = getInitialImageStates(gallery.imageSrcs)
   },
   {
     immediate: true,

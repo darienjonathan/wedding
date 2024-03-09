@@ -1,7 +1,15 @@
 import * as admin from 'firebase-admin'
+import { getApp } from 'firebase-admin/app'
 
-const adminInstance = admin.initializeApp({
-  storageBucket: 'wedding-5c92d',
-})
+const initializeApp = () =>
+  admin.initializeApp({
+    storageBucket: 'wedding-5c92d.appspot.com',
+  })
 
-export default adminInstance
+export const appSingleton = () => {
+  try {
+    return getApp()
+  } catch (err) {
+    return initializeApp()
+  }
+}

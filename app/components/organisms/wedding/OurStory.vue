@@ -6,7 +6,7 @@
     .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
     .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
   .story
-    template(v-for="(story, index) in storiesWithDownloadedPictures")
+    template(v-for="(story, index) in stories")
       .story__item(
         @click="handleStoryClick(index)"
         :style="{ cursor: isStorySelectable(story) ? 'pointer' : 'auto' }"
@@ -24,14 +24,13 @@
   template(v-if="selectedStoryIndex !== undefined")
     StoryModal(
       :is-open="isStoryModalOpen"
-      :story="storiesWithDownloadedPictures[selectedStoryIndex]"
+      :story="stories[selectedStoryIndex]"
       @close="handleCloseStoryModal"
     )
 </template>
 <script lang="ts" setup>
-import type { SectionSettings, Story } from 'types/model/wedding/weddingSettings'
 import StoryModal from '~/components/organisms/wedding/StoryModal.vue'
-import { useStorage } from '~/composables/firebase/storage/useStorage'
+import type { SectionSettings, Story } from '~/types/model/wedding/weddingSettings'
 
 type Props = {
   stories: Story[]
@@ -53,30 +52,12 @@ const props = defineProps({
  * Download Images
  */
 
-const storage = useStorage('')
-
-const storiesWithDownloadedPictures = ref<Story[]>([])
-
-watch(
-  () => props.stories,
-  async stories => {
-    const images = await Promise.all(stories.map(story => storage.getDownloadURL(story.picture)))
-    storiesWithDownloadedPictures.value = stories.map((story, index) => ({
-      ...story,
-      picture: images[index],
-    }))
-  },
-  {
-    immediate: true,
-  }
-)
-
 const isStorySelectable = (story: Story) => !!story.contents.length
 
 const isStoryModalOpen = ref<boolean>(false)
 const selectedStoryIndex = ref<number | undefined>()
 const handleStoryClick = (index: number) => {
-  if (!storiesWithDownloadedPictures.value[index]?.contents?.length) return
+  if (!props.stories[index]?.contents?.length) return
   selectedStoryIndex.value = index
   isStoryModalOpen.value = true
 }
