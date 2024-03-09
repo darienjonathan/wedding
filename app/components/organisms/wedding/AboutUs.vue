@@ -128,7 +128,7 @@ export default {
   & {
     display: grid;
     max-width: 1200px;
-    margin: 0 auto 60px;
+    margin: 0 auto;
     @include pc {
       grid-template-columns: repeat(2, 1fr);
       gap: 0 50px;
