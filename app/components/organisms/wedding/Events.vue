@@ -84,7 +84,7 @@ const dayjs = useNuxtApp().$dayjs
 
 const getDate = (timestamp: number, timezone: string) => {
   const dayjsObject = dayjs(timestamp).tz(timezone)
-  const date = dayjsObject.format('dddd, D MMMM YYYY')
+  const date = dayjsObject.format('dddd, D MMMM YYYY, H:mm')
   const offset = getTimezoneText(timezone, dayjsObject)
 
   return `${date} ${offset}`

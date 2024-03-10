@@ -281,6 +281,10 @@ export default {
   * + * {
     margin-top: 4px;
   }
+
+  &__item {
+    white-space: pre-line;
+  }
 }
 
 .kv {

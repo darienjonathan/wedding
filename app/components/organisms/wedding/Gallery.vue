@@ -143,7 +143,7 @@ const updateImageLoaded = () => {
 
   imageStates.value = imageStates.value.map(imageState => ({
     ...imageState,
-    isLoaded: imageLoadedByOrder.get(imageState.order) || false,
+    isLoaded: imageState.isLoaded || imageLoadedByOrder.get(imageState.order) || false,
   }))
 }
 
