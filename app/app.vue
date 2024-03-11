@@ -6,13 +6,22 @@ div
       rel="canonical"
       :href="url"
     )
+    Link(
+      rel="icon"
+      href="favicon_dark.ico"
+      media="(prefers-color-scheme: dark)"
+    )
+    Link(
+      rel="icon"
+      href="favicon_light.ico"
+      media="(prefers-color-scheme: light)"
+    )
   NuxtLayout
     NuxtPage
 </template>
 <script lang="ts" setup>
-const url = 'https://darienjonathan.com'
-const title = 'darienjonathan.com'
-const description = 'A public space for personal views'
+const { baseURL: url, brand: title } = useRuntimeConfig().public
+const description = 'Wedding Template Service'
 const image = url + '/ogp.png'
 
 const meta = computed(() => {
@@ -25,6 +34,9 @@ const meta = computed(() => {
       name: 'twitter:card',
       content: 'summary_large_image',
     },
+    {
+      name: 'fav'
+    }
   ]
 
   metaArr.push(

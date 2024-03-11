@@ -48,7 +48,7 @@
         template(v-if="isClosingSectionShown")
           .line
           Closing.closing(:sectionSettings="weddingSettings.sectionSettings.closing")
-        Footer.footer(:type="'default'")
+        Footer.footer(:type="weddingSettings.footer.type")
   template(v-if="isInviteeDataLoaded && invitee && weddingSettings?.rsvp.isEnabled")
     RSVP(
       :tenantId="tenantId"
@@ -184,12 +184,14 @@ const handleNavClick = () => {
 // Meta Tags
 // --------------------------------------------------
 
-const url = `${useRuntimeConfig().baseURL}/${tenantId}`
+const { baseURL, brand } = useRuntimeConfig().public
 
-const title = computed(() => `${weddingSettings?.value?.hero.title} | Wedding Invitation`)
+const url = `${baseURL}/${tenantId}`
+
+const title = computed(() => `${weddingSettings?.value?.hero.title} | ${brand}`)
 
 const description = computed(
-  () => `${weddingSettings?.value?.hero.invitationText} | ${weddingSettings.value?.hero.title}`
+  () => `The Wedding of ${weddingSettings.value?.hero.title} | ${weddingSettings?.value?.hero.invitationText}`
 )
 
 const image = computed(
@@ -337,14 +339,6 @@ export default {
     width: 100%;
     background-color: rgba($wedding-brown, 0.5);
     box-shadow: 0 2px 30px 15px rgba($white, 0.5);
-
-    @include pc {
-      height: 50px;
-    }
-
-    @include sp {
-      height: 100px;
-    }
   }
 }
 </style>
