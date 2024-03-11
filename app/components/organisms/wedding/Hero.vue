@@ -19,7 +19,7 @@
         .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
       template(v-if="weddingSettings?.hero.tagline.en")
         .kv__subheading.kv__subheading--en {{ weddingSettings?.hero.tagline.en }}
-      .kv__heading {{ weddingSettings?.hero.title.toLocaleUpperCase() }}
+      .kv__heading {{ `${title.toLocaleUpperCase()}` }}
       .kv__line
       .kv__date {{ kvDate }}
       template(v-if="isEventSectionShown")
@@ -72,12 +72,14 @@ const props = defineProps({
   },
 })
 
-const { isReceptionInvitation, isMatrimonyInvitation, isNotInvited, canRSVP, canReviewRSVP } =
+const { isNotInvited, canRSVP, canReviewRSVP } =
   useInvitee(
     toRef(props, 'invitee'),
     toRef(props, 'inviteeRSVP'),
     computed(() => props.weddingSettings?.rsvp || null)
   )
+
+const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
 
 const inviteeName = computed(() => props.inviteeRSVP?.name || props.invitee?.databaseName || '')
 
@@ -336,7 +338,12 @@ export default {
     @include font($letter-spacing: 0.2rem);
     text-align: center;
     font-size: 4rem;
+    @include sp {
+      white-space: pre-line;
+      word-break: break-word;
+    }
   }
+
   &__line {
     height: 1px;
     background: $white;
