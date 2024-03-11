@@ -46,9 +46,10 @@ export default defineNuxtConfig({
         authPassword: process.env.EMULATOR_AUTH_PASSWORD,
       },
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+      baseURL: process.env.BASE_URL,
+      brand: 'dolciwedding.id'
     },
     functionsBaseURL: process.env.FIREBASE_FUNCTIONS_BASE_API_URL,
-    baseURL: process.env.BASE_URL,
   },
   css: ['@/assets/css/global.scss'],
 })

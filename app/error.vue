@@ -1,15 +1,21 @@
 <template lang="pug">
 .wrapper
-  .error
-    .error__text.-heading {{ heading }}
-    .error__text.-subheading {{ subheading }}
+  .container
+    .error
+      .error__text.-heading {{ heading }}
+      .error__text.-subheading {{ subheading }}
+    a(:href="baseURL")
+      img.logo(src="~/assets/images/brand/brand_light.svg")
 </template>
 <script lang="ts" setup>
 import type { NuxtError } from '#app'
 
+
 const props = defineProps({
   error: Object as () => NuxtError,
 })
+
+const baseURL = useRuntimeConfig().public.baseURL
 
 const heading = computed(() => {
   switch (props.error?.statusCode) {
@@ -37,19 +43,29 @@ definePageMeta({
 @import '~/assets/css/main';
 
 .wrapper {
-  @include flex;
   @include size(100vw, 100vh);
-  background-color: $wedding_brown;
+  @include flex;
+}
+
+.container {
+  @include flex($direction: column, $align-items: flex-start);
+  @include flex-gap($row-gap: 60px);
+  padding: 20px;
+}
+
+.logo {
+  width: 200px;
 }
 
 .error {
-  line-height: 3;
+  @include font-family('marcellus');
 }
 .error__text.-heading {
-  @include font($size: $font-huge, $color: $wedding_green-lighter, $line-height: 2);
+  @include font($size: $font-huge, $color: $black, $line-height: 2);
+  margin-bottom: 16px;
 }
 
 .error__text.-subheading {
-  @include font($size: $font-lg, $color: $wedding_green-lighter, $line-height: 3);
+  @include font($size: $font-lg, $color: $black, $line-height: 1.5);
 }
 </style>

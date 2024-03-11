@@ -1,17 +1,17 @@
 <template lang="pug">
-.footer
+.footer(:data-type="type")
   .footer__text.text
     .text__item {{ curatedText }}
     .text__item.text__item--emphasis {{ curatorText }}
   .footer__links
     a.footer__link(
-      href="https://github.com/darienjonathan/wedding"
+      :href="baseURL"
       target="_blank"
     )
-      img.footer__icon(src="@/assets/images/sns/icon-github-white.png")
+      img.footer__icon(src="@/assets/images/brand/brand_icon_dark.svg")
     template(v-if="type === 'self'")
       a.footer__link(
-        href="/blogs"
+        href="https://darienjonathan.com"
         target="_blank"
       )
         img.footer__icon.footer__icon--blog(src="@/assets/images/sns/blog.png")
@@ -25,11 +25,13 @@ type Props = {
 
 const props = defineProps<Props>()
 
+const { baseURL, brand } = useRuntimeConfig().public
+
 const curatedText = computed(() =>
   props.type === 'self' ? 'Curated with love by:' : 'Curated by:'
 )
 const curatorText = computed(() =>
-  props.type === 'self' ? 'Calon Pengantin Pria' : 'dolciwedding'
+  props.type === 'self' ? 'Calon Pengantin Pria' : brand
 )
 </script>
 <script lang="ts">
@@ -40,32 +42,27 @@ export default {
 <style lang="scss" scoped>
 @import '~/assets/css/main';
 
-$size: 20px;
-
 .footer {
   & {
+    padding: 10px 0;
     display: grid;
     justify-content: center;
     align-items: center;
     align-content: center;
-    column-gap: 12px;
-    @include pc {
-      grid-template-columns: repeat(2, auto);
-    }
-    @include sp {
-      gap: 8px 0;
-    }
-  }
+    column-gap: 6px;
+    grid-template-columns: repeat(2, auto);
 
-  &__text,
-  &__sns {
-    height: $size;
+    &[data-type="self"] {
+      @include sp {
+        grid-template-columns: auto;
+      }
+    }
   }
 
   &__text {
     &.text {
       display: flex;
-      @include flex-gap($column-gap: 0.5ch);
+      @include flex-gap($column-gap: 0.2ch);
 
       &__item {
         @include font-family('marcellus');
@@ -89,10 +86,10 @@ $size: 20px;
   }
 
   &__icon {
-    height: $size;
+    height: 30px;
 
     &--blog {
-      height: $size * 1.75;
+      height: 35px;
     }
   }
 }
