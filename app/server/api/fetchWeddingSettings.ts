@@ -30,7 +30,5 @@ export default defineEventHandler(async event => {
     })
   }
 
-  console.log((data as WeddingSettings).stories.map(s => s.contents))
-
   return data
 })
