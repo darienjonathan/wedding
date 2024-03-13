@@ -5,19 +5,15 @@
     .wrapper
       Hero.hero(
         :weddingSettings="weddingSettings"
-        :invitee="invitee"
-        :inviteeRSVP="inviteeRSVP"
         @nav-click="handleNavClick"
         @loading-done="handleLoadingDone"
-        @RSVPButtonClick="isRSVPModalOpen = true"
       )
-      .content(v-if="isEventSectionShown && weddingSettings")
+      .content(v-if="weddingSettings")
         Events.events(
-          :weddingSettings="weddingSettings"
-          :invitee="invitee"
-          :databaseInviteeRSVP="inviteeRSVP"
+          v-if="isWeddingEventsSectionShown"
+          :weddingEvents="weddingSettings.weddingEvents"
+          :sectionSettings="weddingSettings.sectionSettings.weddingEvents"
           ref="eventsElementRef"
-          @RSVPButtonClick="isRSVPModalOpen = true"
         )
         AboutUs.about-us(
           v-if="isCoupleSectionShown"
@@ -26,7 +22,6 @@
         )
         OurStory.our-story(
           v-if="isStorySectionShown"
-          :invitee="invitee"
           :stories="weddingSettings.stories"
           :sectionSettings="weddingSettings.sectionSettings.story"
         )
@@ -49,25 +44,13 @@
           .line
           Closing.closing(:sectionSettings="weddingSettings.sectionSettings.closing")
         Footer.footer(:type="weddingSettings.footer.type")
-  template(v-if="isInviteeDataLoaded && invitee && weddingSettings?.rsvp.isEnabled")
-    RSVP(
-      :tenantId="tenantId"
-      :isRSVPModalOpen="isRSVPModalOpen"
-      :invitee="invitee"
-      :databaseInviteeRSVP="inviteeRSVP"
-      :rsvpSettings="weddingSettings?.rsvp"
-      @closeRSVPModal="isRSVPModalOpen = false"
-      @promptUpdateInviteeRSVP="handleUpdateInviteRSVP"
-    )
 </template>
 <script lang="ts" setup>
 import AboutUs from '~/components/organisms/wedding/AboutUs.vue'
 import Events from '~/components/organisms/wedding/Events.vue'
 import Hero from '~/components/organisms/wedding/Hero.vue'
-import RSVP from '~/components/organisms/wedding/RSVP.vue'
 import Registry from '~/components/organisms/wedding/Registry.vue'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import MPageLoading from '~~/components/molecules/MPageLoading.vue'
 import Closing from '~~/components/organisms/wedding/Closing.vue'
@@ -75,41 +58,11 @@ import Footer from '~~/components/organisms/wedding/Footer.vue'
 import Gallery from '~~/components/organisms/wedding/Gallery.vue'
 import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import Wishes from '~~/components/organisms/wedding/Wishes.vue'
-import useUid from '~~/composables/wedding/useUid'
 
 const route = useRoute()
 const tenantId = Array.isArray(route.params.tenantId)
   ? route.params.tenantId[0]
   : route.params.tenantId
-
-// --------------------------------------------------
-// User Data
-// --------------------------------------------------
-
-const { uid } = useUid()
-const { useInvitees, useInviteeRSVP } = useFirestoreCollections()
-
-const inviteesFirestore = useInvitees(tenantId)
-const inviteeRSVPFirestore = useInviteeRSVP(tenantId)
-const { data: invitee, status: inviteeFetchStatus } = await useAsyncData<Invitee | null>(
-  () => inviteesFirestore.loadDocument(uid.value),
-  {
-    watch: [uid],
-    server: false,
-  }
-)
-const {
-  data: inviteeRSVP,
-  status: inviteeRSVPFetchStatus,
-  refresh: refreshInviteeRSVP,
-} = await useAsyncData<InviteeRSVP | null>(() => inviteeRSVPFirestore.loadDocument(uid.value), {
-  watch: [uid],
-  server: false,
-})
-
-const isInviteeDataLoaded = computed(
-  () => inviteeFetchStatus.value === 'success' && inviteeRSVPFetchStatus.value === 'success'
-)
 
 // --------------------------------------------------
 // Wedding Settings
@@ -136,24 +89,14 @@ watch(
 )
 
 const {
-  isEventSectionShown,
+  isWeddingEventsSectionShown,
   isCoupleSectionShown,
   isStorySectionShown,
   isGallerySectionShown,
   isWishesSectionShown,
   isRegistrySectionShown,
   isClosingSectionShown,
-} = useWeddingSettings(weddingSettings, invitee, inviteeRSVP)
-
-// --------------------------------------------------
-// RSVP
-// --------------------------------------------------
-
-const isRSVPModalOpen = ref(false)
-
-const handleUpdateInviteRSVP = () => {
-  refreshInviteeRSVP()
-}
+} = useWeddingSettings(weddingSettings)
 
 // --------------------------------------------------
 // Client Side
@@ -264,7 +207,6 @@ export default {
     Closing,
     Registry,
     Footer,
-    RSVP,
   },
 }
 </script>

@@ -1,7 +1,7 @@
 <template lang="pug">
 .wishes
   .heading__wrapper
-    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'GREETINGS & WISHES' }}
+    .heading {{ sectionSettings.title || 'GREETINGS & WISHES' }}
   .content
     .content__form.form
       input.form__name(

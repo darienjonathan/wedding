@@ -14,7 +14,7 @@ export const parseInvitationType = (invitationType: any): InvitationType => {
 }
 
 export type WeddingEvent = {
-  type: InvitationType
+  id: string
   eventName: string
   venue: string
   address: string
@@ -23,10 +23,16 @@ export type WeddingEvent = {
   timestamp: number
   timezone: string
   streamingLink: string
+  invitation: {
+    isUsing: boolean
+    type: InvitationType
+    isDetailed: boolean
+    deadlineTimestamp: number
+  }
 }
 
 export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
-  type: parseInvitationType(data.type),
+  id: parseString(data.id),
   eventName: parseString(data.eventName),
   venue: parseString(data.venue),
   address: parseString(data.address),
@@ -38,7 +44,14 @@ export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
   timestamp: parseNumber(data.timestamp),
   timezone: parseString(data.timezone),
   streamingLink: parseString(data.streamingLink),
+  invitation: {
+    isUsing: parseBoolean(data.invitation?.isUsing),
+    type: parseInvitationType(data.invitation?.type),
+    isDetailed: parseBoolean(data.invitation?.isDetailed),
+    deadlineTimestamp: parseNumber(data.invitation?.deadlineTimestamp),
+  }
 })
+
 
 export type Parent = {
   name: string
@@ -79,13 +92,11 @@ export const parsePerson = (data: any = {}): Person => ({
 export type RSVP = {
   isEnabled: boolean
   masterSheet: string
-  deadlineTimestamp: number
 }
 
 export const parseRSVP = (data: any = {}): RSVP => ({
   isEnabled: parseBoolean(data.isEnabled),
   masterSheet: parseString(data.masterSheet),
-  deadlineTimestamp: parseNumber(data.deadlineTimestamp),
 })
 
 export type Story = {
@@ -164,7 +175,7 @@ export const parseSectionSettings = (data: any = {}): SectionSettings => ({
 
 export type WeddingSettings = {
   ogpImageSrc: string
-  events: WeddingEvent[]
+  weddingEvents: WeddingEvent[]
   couple: [Person, Person]
   rsvp: RSVP
   stories: Story[]
@@ -173,7 +184,7 @@ export type WeddingSettings = {
   hero: Hero
   footer: Footer
   sectionSettings: {
-    event: SectionSettings
+    weddingEvents: SectionSettings
     couple: SectionSettings
     story: SectionSettings
     gallery: SectionSettings
@@ -185,7 +196,7 @@ export type WeddingSettings = {
 
 export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   ogpImageSrc: parseString(data.ogpImageSrc),
-  events: parseArray(data.events, parseWeddingEvent),
+  weddingEvents: parseArray(data.weddingEvents, parseWeddingEvent),
   couple: [parsePerson(data.couple?.[0]), parsePerson(data.couple?.[1])],
   rsvp: parseRSVP(data.rsvp),
   stories: parseArray(data.stories, parseStory),
@@ -194,7 +205,7 @@ export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   hero: parseHero(data.hero),
   footer: parseFooter(data.footer),
   sectionSettings: {
-    event: parseSectionSettings(data.sectionSettings?.event),
+    weddingEvents: parseSectionSettings(data.sectionSettings?.weddingEvents),
     couple: parseSectionSettings(data.sectionSettings?.couple),
     story: parseSectionSettings(data.sectionSettings?.story),
     gallery: parseSectionSettings(data.sectionSettings?.gallery),

@@ -11,29 +11,22 @@
       @load="$emit('loadingDone')"
     )
     .hero__invitation-text.invitation-text
-      template(v-if="!isNotInvited")
-        .invitation-text__item {{ inviteeNameText }}
       .invitation-text__item {{ weddingSettings?.hero.invitationText }}
     .hero__kv.kv
       template(v-if="weddingSettings?.hero.tagline.jp")
         .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
       template(v-if="weddingSettings?.hero.tagline.en")
         .kv__subheading.kv__subheading--en {{ weddingSettings?.hero.tagline.en }}
-      .kv__heading {{ `${title.toLocaleUpperCase()}` }}
+      .kv__heading {{ title }}
       .kv__line
       .kv__date {{ kvDate }}
-      template(v-if="isEventSectionShown")
+      template(v-if="isWeddingEventsSectionShown")
         .kv__nav-btn
           .nav-btn__icon.material-icons-outlined expand_more
           .nav-btn__text(@click="emit('navClick')") {{ 'Events' }}
 
     .bottom__wrapper
       .bottom__buttons
-        template(v-if="shouldShowRSVPButton")
-          .bottom__button.bottom__button--left(
-            @click="handleClickRSVPButton"
-            :data-is-blur="isButtonBlur"
-          ) {{ inviteeRSVP ? 'Review Your RSVP' : 'Wedding Reception RSVP' }}
         a.bottom__button.bottom__button--right(
           v-if="eventToShowStreaming"
           :href="eventToShowStreaming.streamingLink"
@@ -45,16 +38,12 @@
       .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
 </template>
 <script lang="ts" setup>
-import { useInvitee } from '~/composables/wedding/useInvitee'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
 import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
 type Props = {
   weddingSettings: WeddingSettings | null
-  invitee: Invitee | null
-  inviteeRSVP: InviteeRSVP | null
 }
 
 const props = defineProps({
@@ -62,38 +51,9 @@ const props = defineProps({
     type: Object as () => Props['weddingSettings'],
     default: null,
   },
-  invitee: {
-    type: Object as () => Props['invitee'],
-    default: null,
-  },
-  inviteeRSVP: {
-    type: Object as () => Props['inviteeRSVP'],
-    default: null,
-  },
 })
-
-const { isNotInvited, canRSVP, canReviewRSVP } =
-  useInvitee(
-    toRef(props, 'invitee'),
-    toRef(props, 'inviteeRSVP'),
-    computed(() => props.weddingSettings?.rsvp || null)
-  )
 
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
-
-const inviteeName = computed(() => props.inviteeRSVP?.name || props.invitee?.databaseName || '')
-
-const inviteeNameText = computed(() => {
-  const inviteePrefix = props.invitee?.inviteePrefix ? `${props.invitee?.inviteePrefix} ` : ''
-
-  const inviteeSuffix =
-    props.invitee?.inviteeSuffix === 'family'
-      ? ' & Family'
-      : props.invitee?.inviteeSuffix === 'partner'
-      ? ' & Partner'
-      : ''
-  return `Dear ${inviteePrefix}${inviteeName.value}${inviteeSuffix},`
-})
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
 
@@ -130,16 +90,14 @@ onUnmounted(() => {
 // Events
 // --------------------------------------------------
 
-const { isEventSectionShown } = useWeddingSettings(
+const { isWeddingEventsSectionShown } = useWeddingSettings(
   toRef(props, 'weddingSettings'),
-  toRef(props, 'invitee'),
-  toRef(props, 'inviteeRSVP')
 )
 
 const dayjs = useNuxtApp().$dayjs
 
 const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => boolean) => {
-  const events = [...(props.weddingSettings?.events || [])]
+  const events = [...(props.weddingSettings?.weddingEvents || [])]
   let nextEvents = events.filter(
     weddingEvent =>
       (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp))
@@ -209,14 +167,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (!buttonObserverInstance.value) return
   buttonObserverInstance.value.disconnect()
-})
-
-const handleClickRSVPButton = () => {
-  emit('RSVPButtonClick')
-}
-
-const shouldShowRSVPButton = computed(() => {
-  return canRSVP.value || canReviewRSVP.value
 })
 </script>
 <script lang="ts">

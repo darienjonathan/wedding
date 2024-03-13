@@ -1,16 +1,15 @@
 <template lang="pug">
 .events
   .heading__wrapper
-    .heading {{ weddingSettings?.sectionSettings.event.title.toLocaleUpperCase() || 'EVENTS' }}
+    .heading {{ sectionSettings?.title || 'EVENTS' }}
 
   .kv
-    .kv__main {{ weddingSettings?.sectionSettings.event.description.main }}
-    .kv__sub {{ weddingSettings?.sectionSettings.event.description.sub }}
+    .kv__main {{ sectionSettings?.description.main }}
+    .kv__sub {{ sectionSettings?.description.sub }}
 
-  template(v-for="(weddingEvent, index) in (weddingSettings?.events || [])")
-    template(v-if="weddingEvent.type ? eventSectionShowStates[weddingEvent.type] : true")
+  template(v-for="(weddingEvent, index) in (weddingEvents)")
       .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
-        .content__heading {{ weddingEvent.eventName.toLocaleUpperCase() }}
+        .content__heading {{ weddingEvent.eventName }}
         .content__item
           .item__text
             .item__info
@@ -29,56 +28,29 @@
             ref="mapElementRefs"
             :data-index="index"
           )
-  template(v-if="shouldShowRSVPSection")
-    .content
-      .content__heading {{ 'RSVP' }}
-      .content__item
-        MRSVPNotes(
-          :rsvpSettings="weddingSettings?.rsvp"
-          :invitee="invitee"
-          :inviteeRSVP="databaseInviteeRSVP"
-        )
-      template(v-if="canRSVP || canEditRSVP")
-        .button(@click="handleClickRSVPButton") {{ databaseInviteeRSVP ? 'Edit Your RSVP' : 'RSVP Here' }}
 </template>
 <script lang="ts" setup>
-import MRSVPNotes from '~/components/molecules/wedding/MRSVPNotes.vue'
-import ConfirmRSVPModal from '~/components/organisms/wedding/ConfirmRSVPModal.vue'
-import { useInvitee } from '~/composables/wedding/useInvitee'
 import { useMap } from '~/composables/wedding/useMap'
-import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { Invitee, InviteeRSVP } from '~/types/model/wedding/invitee'
-import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import type { SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
 type Props = {
-  weddingSettings: WeddingSettings | null
-  invitee: Invitee | null
-  databaseInviteeRSVP: InviteeRSVP | null
+  weddingEvents: Array<WeddingEvent>
+  sectionSettings: SectionSettings | null
 }
 
 const props = defineProps({
-  weddingSettings: {
-    type: Object as () => Props['weddingSettings'],
+  weddingEvents: {
+    type: Array as () => Props["weddingEvents"],
+    default: []
+  },
+  sectionSettings: {
+    type: Object as () => Props['sectionSettings'],
     required: true,
-  },
-  invitee: {
-    type: Object as () => Props['invitee'],
-    default: null,
-  },
-  databaseInviteeRSVP: {
-    type: Object as () => Props['databaseInviteeRSVP'],
-    default: null,
   },
 })
 
 // SETTINGS
-
-const { eventSectionShowStates } = useWeddingSettings(
-  toRef(props, 'weddingSettings'),
-  toRef(props, 'invitee'),
-  toRef(props, 'databaseInviteeRSVP')
-)
 
 const dayjs = useNuxtApp().$dayjs
 
@@ -90,40 +62,13 @@ const getDate = (timestamp: number, timezone: string) => {
   return `${date} ${offset}`
 }
 
-// INVITEE
 
-const { canRSVP, canReviewRSVP, canEditRSVP, shouldContact } = useInvitee(
-  toRef(props, 'invitee'),
-  toRef(props, 'databaseInviteeRSVP'),
-  computed(() => props.weddingSettings?.rsvp || null)
-)
-
-const events = ref<WeddingEvent[]>([])
-watch(
-  () => props.weddingSettings,
-  weddingSettings => {
-    events.value = weddingSettings?.events || []
-  },
-  {
-    immediate: true,
-  }
-)
-const { mapElementRefs } = useMap(events)
-
-const shouldShowRSVPSection = computed(
-  () => props.weddingSettings?.rsvp && (canRSVP.value || canReviewRSVP.value || shouldContact.value)
-)
-const emit = defineEmits(['RSVPButtonClick'])
-
-const handleClickRSVPButton = () => {
-  emit('RSVPButtonClick')
-}
+const { mapElementRefs } = useMap(toRef(props, "weddingEvents"))
 </script>
 <script lang="ts">
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Events',
-  components: { ConfirmRSVPModal },
 }
 </script>
 <style lang="scss" scoped>

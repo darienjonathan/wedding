@@ -1,5 +1,4 @@
 import type { QueryValue } from 'ufo'
-import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { createEndpoint } from '~/utils/api'
 
 const parseSearchParams = (searchParam: QueryValue): string => {
@@ -29,8 +28,6 @@ export default defineEventHandler(async event => {
       statusMessage: 'tenantId does not exist',
     })
   }
-
-  console.log((data as WeddingSettings).stories.map(s => s.contents))
 
   return data
 })

@@ -6,7 +6,7 @@
       img.link__icon(src="~/assets/images/sns/icon-github.png")
       .link__text darienjonathan/wedding
 </template>
-<script lang="ts">
+<script lang="ts" setup>
 definePageMeta({
   layout: 'base',
 })
