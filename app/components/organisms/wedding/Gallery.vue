@@ -1,7 +1,7 @@
 <template lang="pug">
 .gallery
   .heading__wrapper
-    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'GALLERY' }}
+    .heading {{ sectionSettings.title || 'GALLERY' }}
   .kv
     .kv__main {{ sectionSettings.description.main }}
     .kv__sub {{ sectionSettings.description.sub }}

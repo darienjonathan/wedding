@@ -1,7 +1,7 @@
 <template lang="pug">
 .about-us
   .heading__wrapper
-    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'BRIDE & GROOM' }}
+    .heading {{ sectionSettings.title || 'BRIDE & GROOM' }}
   .kv
     .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
     .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}

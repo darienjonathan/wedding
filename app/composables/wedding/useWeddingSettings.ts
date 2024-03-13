@@ -1,51 +1,19 @@
-import { Invitee, InviteeRSVP } from 'types/model/wedding/invitee'
-import { InvitationType, WeddingSettings } from 'types/model/wedding/weddingSettings'
-import { useInvitee } from '~/composables/wedding/useInvitee'
+import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 
 export const useWeddingSettings = (
   weddingSettings: Ref<WeddingSettings | null>,
-  invitee: Ref<Invitee | null>,
-  inviteeRSVP: Ref<InviteeRSVP | null>
 ) => {
-  const { isMatrimonyInvitation, isReceptionInvitation } = useInvitee(
-    invitee,
-    inviteeRSVP,
-    computed(() => weddingSettings.value?.rsvp || null)
-  )
 
   const getIsSectionShown = (sectionKey: keyof WeddingSettings['sectionSettings']) => {
     const section = weddingSettings.value?.sectionSettings[sectionKey]
     if (!section?.isEnabled) return false
 
-    return !section.isExclusiveToInvitees || !!invitee
+    // TODO: check for invitee existence
+    return !section.isExclusiveToInvitees
   }
 
-  const eventSectionShowStates = computed<Record<NonNullable<InvitationType>, boolean>>(() => {
-    const section = weddingSettings.value?.sectionSettings.event
-    if (!section?.isEnabled) {
-      return {
-        matrimony: false,
-        reception: false,
-      }
-    }
-
-    if (!section.isExclusiveToInvitees) {
-      return {
-        matrimony: true,
-        reception: true,
-      }
-    }
-
-    return {
-      matrimony: isMatrimonyInvitation.value,
-      reception: isReceptionInvitation.value,
-    }
-  })
-
-  const isEventSectionShown = computed(() =>
-    weddingSettings.value?.events.some(weddingEvent =>
-      weddingEvent.type ? eventSectionShowStates.value[weddingEvent.type] === true : true
-    )
+  const isWeddingEventsSectionShown = computed(
+    () => getIsSectionShown('weddingEvents') && weddingSettings.value?.weddingEvents.length
   )
 
   const isCoupleSectionShown = computed(() => {
@@ -70,8 +38,7 @@ export const useWeddingSettings = (
   const isClosingSectionShown = computed(() => getIsSectionShown('closing'))
 
   return {
-    eventSectionShowStates,
-    isEventSectionShown,
+    isWeddingEventsSectionShown,
     isCoupleSectionShown,
     isStorySectionShown,
     isGallerySectionShown,

@@ -1,5 +1,4 @@
 import type { QueryValue } from 'ufo'
-import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { createEndpoint } from '~/utils/api'
 
 const parseSearchParams = (searchParam: QueryValue): string => {

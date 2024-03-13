@@ -1,7 +1,7 @@
 <template lang="pug">
 .our-story
   .heading__wrapper
-    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'OUR STORY' }}
+    .heading {{ sectionSettings.title || 'OUR STORY' }}
   .kv
     .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
     .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}

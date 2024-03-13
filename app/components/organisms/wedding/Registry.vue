@@ -1,7 +1,7 @@
 <template lang="pug">
 .registry
   .heading__wrapper
-    .heading {{ sectionSettings.title.toLocaleUpperCase() || 'REGISTRY' }}
+    .heading {{ sectionSettings.title || 'REGISTRY' }}
   .kv
     .kv__main {{ sectionSettings.description.main }}
     .kv__sub {{ sectionSettings.description.sub }}
