@@ -4,7 +4,8 @@ import { parseWeddingSettings } from '~/types/model/wedding/weddingSettings'
 
 export const WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID = 'WEDDING_SETTINGS_VALUE'
 
-// Wedding
+const wedding = () => new FirestoreWrapper('wedding', 'wedding/{tenantId}', parseWeddingSettings)
+
 const weddingSettings = (tenantId: string) =>
   new FirestoreWrapper<WeddingSettings>(
     `wedding/${tenantId}/weddingSettings`,
@@ -12,4 +13,4 @@ const weddingSettings = (tenantId: string) =>
     parseWeddingSettings
   )
 
-export { weddingSettings }
+export { wedding, weddingSettings }
