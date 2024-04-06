@@ -48,4 +48,12 @@ const markdownHTML = computed(() => {
     color: $navy-blue-light;
   }
 }
+
+:deep(pre) {
+  overflow-x: auto;
+  padding: 10px;
+  background: rgba(gray, 0.25);
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
 </style>

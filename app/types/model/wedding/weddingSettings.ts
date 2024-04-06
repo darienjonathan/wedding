@@ -89,14 +89,36 @@ export const parsePerson = (data: any = {}): Person => ({
   imageSrc: parseString(data.imageSrc),
 })
 
+export type RSVPType = "externalLink" | "markdown" | "sheet"
+
+export const parseRSVPType = (data: any = ""): RSVPType => {
+  switch(data) {
+    case "externalLink":
+      return "externalLink"
+    case "markdown":
+      return "markdown"
+    case "sheet":
+      return "sheet"
+    default:
+      return "markdown"
+  }
+}
+
 export type RSVP = {
   isEnabled: boolean
-  masterSheet: string
+  type: "externalLink" | "markdown" | "sheet"
+  externalLink: string
+  sheet: string
+  markdown: string
 }
 
 export const parseRSVP = (data: any = {}): RSVP => ({
   isEnabled: parseBoolean(data.isEnabled),
-  masterSheet: parseString(data.masterSheet),
+  type: parseRSVPType(data.type),
+  externalLink: parseString(data.externalLink),
+  sheet: parseString(data.sheet),
+  markdown: parseString(data.markdown)
+
 })
 
 export type Story = {
