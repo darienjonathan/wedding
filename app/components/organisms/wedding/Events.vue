@@ -36,7 +36,7 @@
         .content__item
           .item__text
             .item__info
-              AMarkdown.info_markdown(:content="markdown")
+              AMarkdown.info__markdown(:content="markdown")
 </template>
 <script lang="ts" setup>
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
@@ -317,6 +317,15 @@ $reversed-content-class: ".content[data-order='reverse']";
 
   &__markdown {
     width: 100%;
+
+    :deep(pre) {
+      overflow-x: auto;
+      padding: 10px;
+      background: rgba(gray, 0.25);
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
   }
 }
 
