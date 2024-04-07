@@ -2,12 +2,11 @@ import {
   deleteObject,
   listAll,
   ref as reference,
-  StorageReference,
   StringFormat,
   uploadBytes,
-  UploadMetadata,
   uploadString,
 } from 'firebase/storage'
+import type { StorageReference, UploadMetadata } from 'firebase/storage'
 import { getBase64Mime } from '~/utils/getMime'
 
 interface PutArgs<T extends File | string> {

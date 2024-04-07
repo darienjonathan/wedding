@@ -7,42 +7,57 @@
     .kv__main {{ sectionSettings?.description.main }}
     .kv__sub {{ sectionSettings?.description.sub }}
 
-  template(v-for="(weddingEvent, index) in (weddingEvents)")
-      .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
-        .content__heading {{ weddingEvent.eventName }}
+  template(v-for="(weddingEvent, index) in weddingEvents")
+    .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
+      .content__heading {{ weddingEvent.eventName }}
+      .content__item
+        .item__text
+          .item__info
+            .info__main {{ weddingEvent.venue }}
+            .info__sub {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
+          template(v-if="weddingEvent.streamingLink")
+            .item__info
+              .info__sub {{ 'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:' }}
+              a.button(
+                :href="weddingEvent.streamingLink"
+                target="_blank"
+                rel="noopener noreferrer"
+                role="button"
+              ) {{ 'Attend Online' }}
+        .item__graphic.item__graphic--map(
+          ref="mapElementRefs"
+          :data-index="index"
+        )
+  template(v-if="rsvp?.isEnabled")
+    .content
+      .content__heading RSVP
+      //- TODO: Other RSVP formats
+      template(v-if="rsvp?.markdown")
         .content__item
           .item__text
             .item__info
-              .info__main {{ weddingEvent.venue }}
-              .info__sub {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
-            template(v-if="weddingEvent.streamingLink")
-              .item__info
-                .info__sub {{ 'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:' }}
-                a.button(
-                  :href="weddingEvent.streamingLink"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  role="button"
-                ) {{ 'Attend Online' }}
-          .item__graphic.item__graphic--map(
-            ref="mapElementRefs"
-            :data-index="index"
-          )
+              AMarkdown.info__markdown(:content="markdown")
 </template>
 <script lang="ts" setup>
+import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
-import type { SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
+import type { RSVP, SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
 type Props = {
   weddingEvents: Array<WeddingEvent>
+  rsvp: RSVP
   sectionSettings: SectionSettings | null
 }
 
 const props = defineProps({
   weddingEvents: {
-    type: Array as () => Props["weddingEvents"],
-    default: []
+    type: Array as () => Props['weddingEvents'],
+    default: [],
+  },
+  rsvp: {
+    type: Object as () => Props['rsvp'],
+    default: null
   },
   sectionSettings: {
     type: Object as () => Props['sectionSettings'],
@@ -62,8 +77,19 @@ const getDate = (timestamp: number, timezone: string) => {
   return `${date} ${offset}`
 }
 
+const { mapElementRefs } = useMap(toRef(props, 'weddingEvents'))
 
-const { mapElementRefs } = useMap(toRef(props, "weddingEvents"))
+// RSVP
+const markdown = ref()
+
+watch(() => props.rsvp, async (rsvp): Promise<void> => {
+  if (!rsvp?.isEnabled) return
+  if (!rsvp?.markdown) return
+
+  markdown.value = await (await fetch(rsvp.markdown)).text()
+}, {
+  immediate: true
+})
 </script>
 <script lang="ts">
 export default {
@@ -83,9 +109,11 @@ export default {
     @include font-family('marcellus');
     margin-bottom: 20px;
     text-align: center;
+
     @include pc {
       @include font($size: $font-xxhuge, $letter-spacing: 2px);
     }
+
     @include sp {
       @include font($size: $font-xhuge, $letter-spacing: 2px);
     }
@@ -97,10 +125,12 @@ export default {
     @include font-family('marcellus');
     text-align: center;
     margin: 0 auto 60px;
+
     @include pc {
       padding: 0 40px;
       max-width: 1200px;
     }
+
     @include sp {
       width: 100%;
       padding: 0 20px;
@@ -109,9 +139,11 @@ export default {
 
   &__main {
     white-space: pre-line;
+
     @include pc {
       margin-bottom: 8px;
     }
+
     @include sp {
       @include font($size: $font-sm, $line-height: 1.5);
       margin-bottom: 16px;
@@ -122,6 +154,7 @@ export default {
     @include pc {
       @include font($size: $font-sm);
     }
+
     @include sp {
       @include font($size: $font-xs);
     }
@@ -133,6 +166,7 @@ $reversed-content-class: ".content[data-order='reverse']";
 .content {
   & {
     margin: 0 auto 40px;
+
     @include pc {
       max-width: 1200px;
     }
@@ -144,12 +178,15 @@ $reversed-content-class: ".content[data-order='reverse']";
     margin-bottom: 16px;
     width: 100%;
     border-bottom: 1px solid $white;
+
     @include pc {
       @include font($size: $font-huge, $letter-spacing: 1px);
     }
+
     @include sp {
       @include font($size: $font-xxxl, $letter-spacing: 1px);
     }
+
     #{$reversed-content-class} & {
       text-align: right;
     }
@@ -157,14 +194,17 @@ $reversed-content-class: ".content[data-order='reverse']";
 
   &__item {
     width: 100%;
+
     @include pc {
       @include flex($justify: space-between, $align-items: flex-start);
+
       #{$reversed-content-class} & {
         flex-direction: row-reverse;
       }
     }
   }
 }
+
 .item {
   &__info {
     &:not(:last-child) {
@@ -189,6 +229,7 @@ $reversed-content-class: ".content[data-order='reverse']";
 
     #{$reversed-content-class} & {
       text-align: right;
+
       @include pc {
         margin-right: 0;
         margin-left: 32px;
@@ -209,6 +250,7 @@ $reversed-content-class: ".content[data-order='reverse']";
     @include pc {
       height: 300px;
     }
+
     @include sp {
       height: 500px;
     }
@@ -259,16 +301,31 @@ $reversed-content-class: ".content[data-order='reverse']";
       @include font($size: $font-xxl);
       margin-bottom: 12px;
     }
+
     @include sp {
       @include font($size: $font-xl);
       margin-bottom: 8px;
       white-space: pre-wrap;
     }
   }
+
   &__sub {
     @include sp {
       @include font($size: $font-sm);
       white-space: pre-wrap;
+    }
+  }
+
+  &__markdown {
+    width: 100%;
+
+    :deep(pre) {
+      overflow-x: auto;
+      padding: 10px;
+      background: rgba(gray, 0.25);
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
   }
 }
@@ -281,6 +338,7 @@ $reversed-content-class: ".content[data-order='reverse']";
   cursor: pointer;
   filter: drop-shadow(0 0 5px $white);
   transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out, opacity 0.5s;
+
   &:hover {
     background-color: rgba($white, 0.05);
   }
@@ -303,6 +361,7 @@ $reversed-content-class: ".content[data-order='reverse']";
   @include floating-button;
   text-decoration: none;
   color: inherit;
+
   @include pc {
     margin-top: 16px;
   }

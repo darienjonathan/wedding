@@ -9,16 +9,17 @@
         @loading-done="handleLoadingDone"
       )
       .content(v-if="weddingSettings")
-        Events.events(
-          v-if="isWeddingEventsSectionShown"
-          :weddingEvents="weddingSettings.weddingEvents"
-          :sectionSettings="weddingSettings.sectionSettings.weddingEvents"
-          ref="eventsElementRef"
-        )
         AboutUs.about-us(
           v-if="isCoupleSectionShown"
           :couple="weddingSettings.couple"
           :sectionSettings="weddingSettings.sectionSettings.couple"
+        )
+        Events.events(
+          v-if="isWeddingEventsSectionShown"
+          :weddingEvents="weddingSettings.weddingEvents"
+          :rsvp="weddingSettings.rsvp"
+          :sectionSettings="weddingSettings.sectionSettings.weddingEvents"
+          ref="eventsElementRef"
         )
         OurStory.our-story(
           v-if="isStorySectionShown"
