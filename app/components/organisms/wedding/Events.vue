@@ -83,9 +83,7 @@ const { mapElementRefs } = useMap(toRef(props, 'weddingEvents'))
 const markdown = ref()
 
 watch(() => props.rsvp, async (rsvp): Promise<void> => {
-  console.log(rsvp, rsvp.isEnabled, rsvp.markdown)
   markdown.value = await (await fetch(rsvp.markdown)).text()
-  console.log(markdown.value)
 }, {
   immediate: true
 })
