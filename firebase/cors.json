@@ -1,7 +1,7 @@
 [
-  {
-    "origin": ["https://darienjonathan.com"],
-    "method": ["GET"],
-    "maxAgeSeconds": 3600
-  }
+    {
+      "origin": ["https://dolciwedding.id", "https://wedding-5c92d.firebaseapp.com", "https://wedding-5c92d.web.app"],
+      "method": ["GET"],
+      "maxAgeSeconds": 3600
+    }
 ]
