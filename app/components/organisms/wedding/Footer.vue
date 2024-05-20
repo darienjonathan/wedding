@@ -32,7 +32,7 @@ const props = defineProps<Props>()
 const { baseURL, brand } = useRuntimeConfig().public
 
 const curatedText = computed(() =>
-  props.type === 'self' ? 'Curated with love by:' : 'Curated by:'
+  props.type === 'self' ? 'Curated with love by:' : 'Curated by:',
 )
 const curatorText = computed(() => (props.type === 'self' ? 'Calon Pengantin Pria' : brand))
 </script>

@@ -83,7 +83,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 const { vw, vh, getValues } = useViewportUnitSizes()

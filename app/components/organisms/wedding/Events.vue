@@ -87,7 +87,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 </script>
 <style lang="scss" scoped>
@@ -335,7 +335,10 @@ $reversed-content-class: ".content[data-order='reverse']";
   border-radius: 8px;
   cursor: pointer;
   filter: drop-shadow(0 0 5px $white);
-  transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out, opacity 0.5s;
+  transition:
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out,
+    opacity 0.5s;
 
   &:hover {
     background-color: rgba($white, 0.05);

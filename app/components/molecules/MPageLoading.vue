@@ -54,9 +54,9 @@ const unwatch = watch(
           defineViewportVariables()
         })
       },
-      { once: true }
+      { once: true },
     )
-  }
+  },
 )
 
 onUnmounted(() => {

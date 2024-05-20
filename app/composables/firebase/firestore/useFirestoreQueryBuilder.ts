@@ -68,7 +68,7 @@ const useFirestoreQueryBuilder = <T>(firestoreRef: CollectionReference<T>) => {
   const build = (): Query<T> => {
     const queryConstraints: QueryConstraint[] = []
     queryConstraints.push(
-      ...queries.whereArgsArr.map(([fieldPath, opStr, val]) => where(fieldPath, opStr, val))
+      ...queries.whereArgsArr.map(([fieldPath, opStr, val]) => where(fieldPath, opStr, val)),
     )
     if (queries.orderByArgs) queryConstraints.push(orderByFn(...queries.orderByArgs))
     if (queries.limitArgs) queryConstraints.push(limitFn(queries.limitArgs))

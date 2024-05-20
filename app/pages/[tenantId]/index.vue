@@ -91,7 +91,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 const {
@@ -140,11 +140,11 @@ const title = computed(() => `${weddingSettings?.value?.hero.title} | ${brand}`)
 
 const description = computed(
   () =>
-    `The Wedding of ${weddingSettings.value?.hero.title} | ${weddingSettings?.value?.hero.invitationText}`
+    `The Wedding of ${weddingSettings.value?.hero.title} | ${weddingSettings?.value?.hero.invitationText}`,
 )
 
 const image = computed(
-  () => weddingSettings.value?.ogpImageSrc || weddingSettings.value?.hero.imageSrc || ''
+  () => weddingSettings.value?.ogpImageSrc || weddingSettings.value?.hero.imageSrc || '',
 )
 
 const meta = computed(() => {
@@ -167,19 +167,19 @@ const meta = computed(() => {
     ...['og:title', 'twitter:title'].map(name => ({
       name,
       content: title.value,
-    }))
+    })),
   )
   metaArr.push(
     ...['description', 'og:description', 'twitter:description'].map(name => ({
       name,
       content: description.value,
-    }))
+    })),
   )
   metaArr.push(
     ...['og:image', 'twitter:image'].map(name => ({
       name,
       content: image.value,
-    }))
+    })),
   )
   return metaArr
 })

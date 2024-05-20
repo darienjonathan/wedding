@@ -77,7 +77,7 @@ onMounted(() => {
     {
       rootMargin: '0px',
       threshold: [0.0, 1.0],
-    }
+    },
   )
   observer.observe(observerElementRef.value)
   observerInstance.value = observer
@@ -100,7 +100,7 @@ const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => bo
   const events = [...(props.weddingSettings?.weddingEvents || [])]
   let nextEvents = events.filter(
     weddingEvent =>
-      (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp))
+      (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp)),
   )
 
   if (!nextEvents.length) {
@@ -126,7 +126,7 @@ const kvDate = computed(() => {
 })
 
 const eventToShowStreaming = computed(() =>
-  getEarliestAvailableEvent(weddingEvent => !!weddingEvent.streamingLink)
+  getEarliestAvailableEvent(weddingEvent => !!weddingEvent.streamingLink),
 )
 
 const streamingEventText = computed(() => {
@@ -158,7 +158,7 @@ onMounted(() => {
     {
       rootMargin: '150px',
       threshold: [0.0, 1.0],
-    }
+    },
   )
   observer.observe(buttonObserverElementRef.value)
   buttonObserverInstance.value = observer
@@ -338,7 +338,10 @@ onUnmounted(() => {
   border-radius: 8px;
   cursor: pointer;
   filter: drop-shadow(0 0 5px $white);
-  transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out, opacity 0.5s;
+  transition:
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out,
+    opacity 0.5s;
   &:hover {
     background-color: rgba($white, 0.05);
   }

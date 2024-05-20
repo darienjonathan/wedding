@@ -34,7 +34,7 @@ export const useStorage = (path = '', allowedTypes?: string[]) => {
 
   const createMetadata = (
     customMetadata: UploadMetadata['customMetadata'],
-    type: string | undefined
+    type: string | undefined,
   ): UploadMetadata => {
     return {
       ...customMetadata,

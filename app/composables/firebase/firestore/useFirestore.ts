@@ -4,8 +4,8 @@ import type {
   DocumentReference,
   QueryDocumentSnapshot,
   QuerySnapshot,
-  Unsubscribe
-} from 'firebase/firestore';
+  Unsubscribe,
+} from 'firebase/firestore'
 import {
   addDoc,
   collection,
@@ -15,14 +15,14 @@ import {
   getDocs,
   onSnapshot,
   setDoc,
-  updateDoc
+  updateDoc,
 } from 'firebase/firestore'
 import useFirestoreQueryBuilder from '~/composables/firebase/firestore/useFirestoreQueryBuilder'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useFirestore = <T extends Record<string, any>>(
   path: string,
-  parse: (data: DocumentData) => T
+  parse: (data: DocumentData) => T,
 ) => {
   const firestore = useNuxtApp().$firebase.firestore.instance
 
@@ -52,7 +52,7 @@ const useFirestore = <T extends Record<string, any>>(
   }
 
   const subscribeCollection = (
-    fn: (map: Map<string, T> | undefined) => void | Promise<void>
+    fn: (map: Map<string, T> | undefined) => void | Promise<void>,
   ): Unsubscribe => {
     return onSnapshot(queryBuilder.build(), (querySnapshot: QuerySnapshot) => {
       const data = querySnapshot.empty ? undefined : querySnapshotToMap(querySnapshot)

@@ -57,7 +57,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 const handleClose = () => {

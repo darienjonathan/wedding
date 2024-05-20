@@ -1,4 +1,4 @@
- /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { parseArray, parseBoolean, parseNumber, parseString } from '~/types/model/parse'
 
@@ -48,9 +48,8 @@ export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
     type: parseInvitationType(data.invitation?.type),
     isDetailed: parseBoolean(data.invitation?.isDetailed),
     deadlineTimestamp: parseNumber(data.invitation?.deadlineTimestamp),
-  }
+  },
 })
-
 
 export type Parent = {
   name: string
@@ -91,7 +90,7 @@ export const parsePerson = (data: any = {}): Person => ({
 export type RSVPType = 'externalLink' | 'markdown' | 'sheet'
 
 export const parseRSVPType = (data: any = ''): RSVPType => {
-  switch(data) {
+  switch (data) {
     case 'externalLink':
       return 'externalLink'
     case 'markdown':
@@ -116,8 +115,7 @@ export const parseRSVP = (data: any = {}): RSVP => ({
   type: parseRSVPType(data.type),
   externalLink: parseString(data.externalLink),
   sheet: parseString(data.sheet),
-  markdown: parseString(data.markdown)
-
+  markdown: parseString(data.markdown),
 })
 
 export type Story = {

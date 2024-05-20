@@ -1,10 +1,4 @@
-import type {
-  Auth,
-  AuthError,
-  Unsubscribe,
-  User,
-  UserCredential
-} from 'firebase/auth';
+import type { Auth, AuthError, Unsubscribe, User, UserCredential } from 'firebase/auth'
 import type { SignInStatus } from '~/types/firebase'
 
 import {
@@ -17,7 +11,7 @@ import {
   signOut as signOutFn,
   updateEmail as updateEmailFn,
   updatePassword as updatePasswordFn,
-  updateProfile as updateProfileFn
+  updateProfile as updateProfileFn,
 } from 'firebase/auth'
 
 const useAuth = () => {
@@ -58,7 +52,6 @@ const useAuth = () => {
       if (!auth.value) throw new Error('auth does not exist')
       return signInWithEmailAndPassword(auth.value, email, password)
     } catch (error) {
-
       return Promise.reject(error as AuthError)
     }
   }
