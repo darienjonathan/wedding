@@ -10,10 +10,9 @@
 <script lang="ts" setup>
 import type { NuxtError } from '#app'
 
-
-const props = defineProps({
-  error: Object as () => NuxtError,
-})
+const props = defineProps<{
+  error: NuxtError
+}>()
 
 const baseURL = useRuntimeConfig().public.baseURL
 
@@ -33,8 +32,7 @@ const subheading = computed(() => {
       return props.error?.message || props.error?.cause
   }
 })
-</script>
-<script lang="ts">
+
 definePageMeta({
   layout: 'base',
 })

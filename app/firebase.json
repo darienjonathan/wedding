@@ -1,7 +1,7 @@
 {
   "functions": {
     "source": ".output/server",
-    "runtime": "nodejs18",
+    "runtime": "nodejs20",
     "codebase": "nuxt",
     "predeploy": ["cd .output/server && yarn"]
   },

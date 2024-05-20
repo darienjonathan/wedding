@@ -61,7 +61,7 @@ const oldWeddingSettings = (tenantId: string) =>
   new FirestoreWrapper<OldWeddingSettings>(
     `wedding/${tenantId}/weddingSettings`,
     `wedding/${tenantId}/weddingSettings/{weddingSettingsUid}`,
-    parseOldWeddingSettings
+    parseOldWeddingSettings,
   )
 
 export const changeEventsToWeddingEvents = onRequest(
@@ -72,13 +72,13 @@ export const changeEventsToWeddingEvents = onRequest(
 
     for (const tenantId of tenantIds) {
       const oldWeddingSetting = await oldWeddingSettings(tenantId).loadDocument(
-        WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID
+        WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID,
       )
 
       if (oldWeddingSetting) {
         const existingEvents = structuredClone(oldWeddingSetting.events)
         const existingEventsSectionSettings = structuredClone(
-          oldWeddingSetting.sectionSettings.events
+          oldWeddingSetting.sectionSettings.events,
         )
         if (existingEvents && existingEventsSectionSettings) {
           const updatedWeddingSetting: WeddingSettings = {
@@ -92,12 +92,12 @@ export const changeEventsToWeddingEvents = onRequest(
 
           await weddingSettings(tenantId).set(
             WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID,
-            parseWeddingSettings(updatedWeddingSetting)
+            parseWeddingSettings(updatedWeddingSetting),
           )
         }
       }
     }
 
     res.end()
-  }
+  },
 )

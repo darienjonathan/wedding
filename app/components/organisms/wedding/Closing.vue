@@ -9,17 +9,15 @@
 <script lang="ts" setup>
 import type { SectionSettings } from '~/types/model/wedding/weddingSettings'
 
+defineOptions({
+  name: 'ContentClosing',
+})
+
 type Props = {
   sectionSettings: SectionSettings
 }
 
 defineProps<Props>()
-</script>
-<script lang="ts">
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Closing',
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

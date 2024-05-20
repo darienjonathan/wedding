@@ -1,6 +1,7 @@
+import type { Auth, AuthError, Unsubscribe, User, UserCredential } from 'firebase/auth'
+import type { SignInStatus } from '~/types/firebase'
+
 import {
-  Auth,
-  AuthError,
   createUserWithEmailAndPassword,
   deleteUser as deleteUserFn,
   getAuth,
@@ -8,14 +9,10 @@ import {
   sendPasswordResetEmail as sendPasswordResetEmailFn,
   signInWithEmailAndPassword,
   signOut as signOutFn,
-  Unsubscribe,
   updateEmail as updateEmailFn,
   updatePassword as updatePasswordFn,
   updateProfile as updateProfileFn,
-  User,
-  UserCredential,
 } from 'firebase/auth'
-import { SignInStatus } from '~/types/firebase'
 
 const useAuth = () => {
   const unsubscribe = ref<Unsubscribe>()
@@ -46,7 +43,6 @@ const useAuth = () => {
       if (!auth.value) throw new Error('auth does not exist')
       return createUserWithEmailAndPassword(auth.value, email, password)
     } catch (error) {
-      // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject(error as AuthError)
     }
   }
@@ -56,7 +52,6 @@ const useAuth = () => {
       if (!auth.value) throw new Error('auth does not exist')
       return signInWithEmailAndPassword(auth.value, email, password)
     } catch (error) {
-      // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject(error as AuthError)
     }
   }

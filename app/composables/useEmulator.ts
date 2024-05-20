@@ -16,7 +16,7 @@ const useEmulator = () => {
     connectFirestoreEmulator(
       firestore,
       firebaseEmulator.host,
-      Number(firebaseEmulator.firestorePort)
+      Number(firebaseEmulator.firestorePort),
     )
 
     const storage = $firebase.storage.instance

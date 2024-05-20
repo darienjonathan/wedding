@@ -21,13 +21,13 @@ export const getSheets = (): Promise<sheets_v4.Sheets> => {
 
       const sheets = google.sheets({ version: 'v4', auth })
       resolve(sheets)
-    })
+    }),
   )
 }
 
 export const batchUpdate = async (
   sheets: sheets_v4.Sheets,
-  data: sheets_v4.Schema$ValueRange[]
+  data: sheets_v4.Schema$ValueRange[],
 ) => {
   const request: sheets_v4.Params$Resource$Spreadsheets$Values$Batchupdate = {
     spreadsheetId: process.env.SPREADSHEET_ID,
@@ -44,7 +44,7 @@ export const batchUpdate = async (
 
 export const getSheetRows = async (
   sheets: sheets_v4.Sheets,
-  range?: string
+  range?: string,
 ): Promise<sheets_v4.Schema$ValueRange['values']> => {
   if (!range) return
 

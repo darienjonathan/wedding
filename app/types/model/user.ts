@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { parseString } from '~/types/model/parse'
 
-export interface User {
+export type User = {
   username: string
   roleUid: string
 }
@@ -13,7 +12,7 @@ export const parseUser = (data: any): User => ({
   roleUid: parseString(data.roleUid),
 })
 
-export interface UserInfo {
+export type UserInfo = {
   email: string
 }
 

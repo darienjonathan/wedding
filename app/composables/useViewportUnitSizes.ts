@@ -5,7 +5,7 @@ const DEVICE_PIXEL_RATIO_VAR_NAME = '--device-pixel-ratio'
 const defineVw = () => {
   document.documentElement.style.setProperty(
     VW_VAR_NAME,
-    `${document.documentElement.clientWidth / 100}px`
+    `${document.documentElement.clientWidth / 100}px`,
   )
 }
 
@@ -16,7 +16,7 @@ const defineVh = () => {
 const defineDevicePixelRatio = () => {
   document.documentElement.style.setProperty(
     DEVICE_PIXEL_RATIO_VAR_NAME,
-    window.devicePixelRatio.toString()
+    window.devicePixelRatio.toString(),
   )
 }
 

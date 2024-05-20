@@ -1,9 +1,6 @@
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 
-export const useWeddingSettings = (
-  weddingSettings: Ref<WeddingSettings | null>,
-) => {
-
+export const useWeddingSettings = (weddingSettings: Ref<WeddingSettings | null>) => {
   const getIsSectionShown = (sectionKey: keyof WeddingSettings['sectionSettings']) => {
     const section = weddingSettings.value?.sectionSettings[sectionKey]
     if (!section?.isEnabled) return false
@@ -13,7 +10,7 @@ export const useWeddingSettings = (
   }
 
   const isWeddingEventsSectionShown = computed(
-    () => getIsSectionShown('weddingEvents') && weddingSettings.value?.weddingEvents.length
+    () => getIsSectionShown('weddingEvents') && weddingSettings.value?.weddingEvents.length,
   )
 
   const isCoupleSectionShown = computed(() => {
@@ -22,17 +19,17 @@ export const useWeddingSettings = (
   })
 
   const isStorySectionShown = computed(
-    () => getIsSectionShown('story') && weddingSettings.value?.stories.length
+    () => getIsSectionShown('story') && weddingSettings.value?.stories.length,
   )
 
   const isGallerySectionShown = computed(
-    () => getIsSectionShown('gallery') && weddingSettings.value?.gallery.imageSrcs.length
+    () => getIsSectionShown('gallery') && weddingSettings.value?.gallery.imageSrcs.length,
   )
 
   const isWishesSectionShown = computed(() => getIsSectionShown('wishes'))
 
   const isRegistrySectionShown = computed(
-    () => getIsSectionShown('registry') && weddingSettings.value?.registries.length
+    () => getIsSectionShown('registry') && weddingSettings.value?.registries.length,
   )
 
   const isClosingSectionShown = computed(() => getIsSectionShown('closing'))
