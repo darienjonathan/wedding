@@ -17,20 +17,11 @@
 </template>
 <script lang="ts" setup>
 import type { ASelect } from '~/types/components'
-// NOTE: using type to define props loses the ability to specify default value
-defineProps({
-  isDisabled: {
-    type: Boolean as () => ASelect['isDisabled'],
-    default: false,
-  },
-  label: {
-    type: String as () => ASelect['label'],
-    required: true,
-  },
-  items: {
-    type: Array as () => ASelect['items'],
-    required: true,
-  },
+
+type Props = Pick<ASelect, 'isDisabled' | 'label' | 'items'>
+
+withDefaults(defineProps<Props>(), {
+  isDisabled: false,
 })
 
 const emit = defineEmits<{

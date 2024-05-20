@@ -19,6 +19,10 @@
 <script lang="ts" setup>
 import type { Footer } from '~/types/model/wedding/weddingSettings'
 
+defineOptions({
+  name: 'ContentFooter',
+})
+
 type Props = {
   type: Footer['type']
 }
@@ -28,16 +32,9 @@ const props = defineProps<Props>()
 const { baseURL, brand } = useRuntimeConfig().public
 
 const curatedText = computed(() =>
-  props.type === 'self' ? 'Curated with love by:' : 'Curated by:'
+  props.type === 'self' ? 'Curated with love by:' : 'Curated by:',
 )
-const curatorText = computed(() =>
-  props.type === 'self' ? 'Calon Pengantin Pria' : brand
-)
-</script>
-<script lang="ts">
-export default {
-  name: 'WeddingFooter',
-}
+const curatorText = computed(() => (props.type === 'self' ? 'Calon Pengantin Pria' : brand))
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';
@@ -52,7 +49,7 @@ export default {
     column-gap: 6px;
     grid-template-columns: repeat(2, auto);
 
-    &[data-type="self"] {
+    &[data-type='self'] {
       @include sp {
         grid-template-columns: auto;
       }

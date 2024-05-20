@@ -1,4 +1,4 @@
-import type { WeddingEvent } from 'types/model/wedding/weddingSettings'
+import type { WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import useGoogleMaps from '~/composables/useMap'
 
 export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
@@ -16,11 +16,10 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
 
       const loadMapLibrary = loader.value.importLibrary('maps')
       const loadMarkerLibrary = loader.value.importLibrary('marker')
-      Promise.all([loadMapLibrary, loadMarkerLibrary]).then(
-        () => {
-          const position = weddingEvent.centerCoordinate
+      Promise.all([loadMapLibrary, loadMarkerLibrary]).then(() => {
+        const position = weddingEvent.centerCoordinate
 
-          const infoWindowContent = `
+        const infoWindowContent = `
   <div class="address">
     <div class="address__title">${weddingEvent.venue}</div>
     <div class="address__text">${weddingEvent.address}</div>
@@ -31,30 +30,29 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
   </div>
       `
 
-          const map = new google.maps.Map(mapElement, {
-            center: position,
-            zoom: 16,
-            mapTypeControlOptions: {
-              mapTypeIds: ['ROADMAP'],
-            },
-            mapId: '67c94aa1464993bf',
-          })
-          const marker = new google.maps.marker.AdvancedMarkerElement({
-            position,
+        const map = new google.maps.Map(mapElement, {
+          center: position,
+          zoom: 16,
+          mapTypeControlOptions: {
+            mapTypeIds: ['ROADMAP'],
+          },
+          mapId: '67c94aa1464993bf',
+        })
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position,
+          map,
+        })
+        const infoWindow = new google.maps.InfoWindow({ content: infoWindowContent })
+
+        const openInfoWindow = () => {
+          infoWindow.open({
+            anchor: marker,
             map,
           })
-          const infoWindow = new google.maps.InfoWindow({ content: infoWindowContent })
-
-          const openInfoWindow = () => {
-            infoWindow.open({
-              anchor: marker,
-              map,
-            })
-          }
-          marker.addListener('click', openInfoWindow)
-          openInfoWindow()
         }
-      )
+        marker.addListener('click', openInfoWindow)
+        openInfoWindow()
+      })
     })
   }
 

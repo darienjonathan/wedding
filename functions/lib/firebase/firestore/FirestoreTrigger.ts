@@ -5,12 +5,12 @@ import { getFunctions } from '~/lib/firebase/functions'
 type ChangeCallbackFunction<T> = (
   before: T,
   after: T,
-  context: functions.EventContext
+  context: functions.EventContext,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => any
 type SnapshotCallbackFunction<T> = (
   data: T,
-  context: functions.EventContext
+  context: functions.EventContext,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) => any
 
@@ -30,7 +30,7 @@ class FirestoreTrigger<T> {
   private snapshotCallback<U>(
     snapshot: QueryDocumentSnapshot,
     context: functions.EventContext,
-    callbackFn: SnapshotCallbackFunction<T | U | undefined>
+    callbackFn: SnapshotCallbackFunction<T | U | undefined>,
   ) {
     const data = snapshot.exists ? this.parse(snapshot.data() || {}) : undefined
     return callbackFn(data, context)
@@ -39,7 +39,7 @@ class FirestoreTrigger<T> {
   private changeCallback<U>(
     change: functions.Change<DocumentSnapshot>,
     context: functions.EventContext,
-    callbackFn: ChangeCallbackFunction<T | U | undefined>
+    callbackFn: ChangeCallbackFunction<T | U | undefined>,
   ) {
     const before = change.before.exists ? this.parse(change.before.data() || {}) : undefined
     const after = change.after.exists ? this.parse(change.after.data() || {}) : undefined
@@ -48,25 +48,25 @@ class FirestoreTrigger<T> {
 
   public onCreate<U = T>(callbackFn: SnapshotCallbackFunction<T | U | undefined>) {
     return this.documentPath.onCreate((snapshot, context) =>
-      this.snapshotCallback(snapshot, context, callbackFn)
+      this.snapshotCallback(snapshot, context, callbackFn),
     )
   }
 
   public onDelete<U = T>(callbackFn: SnapshotCallbackFunction<T | U | undefined>) {
     return this.documentPath.onDelete((snapshot, context) =>
-      this.snapshotCallback(snapshot, context, callbackFn)
+      this.snapshotCallback(snapshot, context, callbackFn),
     )
   }
 
   public onWrite<U = T>(callbackFn: ChangeCallbackFunction<T | U | undefined>) {
     return this.documentPath.onWrite((change, context) =>
-      this.changeCallback(change, context, callbackFn)
+      this.changeCallback(change, context, callbackFn),
     )
   }
 
   public onUpdate<U = T>(callbackFn: ChangeCallbackFunction<T | U | undefined>) {
     return this.documentPath.onUpdate((change, context) =>
-      this.changeCallback(change, context, callbackFn)
+      this.changeCallback(change, context, callbackFn),
     )
   }
 }

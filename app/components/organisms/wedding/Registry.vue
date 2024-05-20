@@ -16,18 +16,17 @@
 <script lang="ts" setup>
 import type { Registry, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
+defineOptions({
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Registry',
+})
+
 type Props = {
   registries: Registry[]
   sectionSettings: SectionSettings
 }
 
 defineProps<Props>()
-</script>
-<script lang="ts">
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Registry',
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

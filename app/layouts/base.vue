@@ -4,6 +4,10 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'BaseLayout',
+})
+
 useModal()
 useViewportUnitSizes(true)
 

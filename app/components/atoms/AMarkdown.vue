@@ -3,12 +3,10 @@
 </template>
 <script lang="ts" setup>
 const { $md } = useNuxtApp()
-const props = defineProps({
-  content: {
-    type: String,
-    default: '',
-  },
+const props = withDefaults(defineProps<{ content: string }>(), {
+  content: '',
 })
+
 const markdownHTML = computed(() => {
   return $md.render(props.content)
 })

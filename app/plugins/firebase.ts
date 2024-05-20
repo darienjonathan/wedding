@@ -1,4 +1,5 @@
-import { FirebaseApp, FirebaseOptions, initializeApp } from 'firebase/app'
+import type { FirebaseApp, FirebaseOptions } from 'firebase/app'
+import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getDownloadURL as storageGetDownloadURL, getStorage, ref } from 'firebase/storage'
 

@@ -14,30 +14,20 @@
     ) {{ errorText }}
 </template>
 <script lang="ts" setup>
-interface Props {
+defineOptions({
+  name: 'MInput',
+})
+
+type Props = {
   label: string
   noteText?: string
   errorText?: string
 }
-defineProps({
-  label: {
-    type: String as () => Props['label'],
-    required: true,
-  },
-  noteText: {
-    type: String as () => Props['noteText'],
-    default: '',
-  },
-  errorText: {
-    type: String as () => Props['errorText'],
-    default: '',
-  },
+
+withDefaults(defineProps<Props>(), {
+  noteText: '',
+  errorText: '',
 })
-</script>
-<script lang="ts">
-export default {
-  name: 'MInput',
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

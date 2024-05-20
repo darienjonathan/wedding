@@ -43,7 +43,7 @@ const processRecord = async (record: Record<string, any>): Promise<Record<string
   const entries = await Promise.all(
     Object.entries(record).map(async ([key, value]) => {
       return [key, await processValue(value)]
-    })
+    }),
   )
 
   return Object.fromEntries(entries)
@@ -59,9 +59,9 @@ export const fetchWeddingSettings = onRequest(
     }
 
     const data = await weddingSettings(tenantId as string).loadDocument(
-      WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID
+      WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID,
     )
 
     res.json({ data: data ? await processRecord(data) : null })
-  }
+  },
 )

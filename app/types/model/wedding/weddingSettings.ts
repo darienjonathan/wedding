@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { parseArray, parseBoolean, parseNumber, parseString } from '~/types/model/parse'
@@ -49,9 +48,8 @@ export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
     type: parseInvitationType(data.invitation?.type),
     isDetailed: parseBoolean(data.invitation?.isDetailed),
     deadlineTimestamp: parseNumber(data.invitation?.deadlineTimestamp),
-  }
+  },
 })
-
 
 export type Parent = {
   name: string
@@ -89,24 +87,24 @@ export const parsePerson = (data: any = {}): Person => ({
   imageSrc: parseString(data.imageSrc),
 })
 
-export type RSVPType = "externalLink" | "markdown" | "sheet"
+export type RSVPType = 'externalLink' | 'markdown' | 'sheet'
 
-export const parseRSVPType = (data: any = ""): RSVPType => {
-  switch(data) {
-    case "externalLink":
-      return "externalLink"
-    case "markdown":
-      return "markdown"
-    case "sheet":
-      return "sheet"
+export const parseRSVPType = (data: any = ''): RSVPType => {
+  switch (data) {
+    case 'externalLink':
+      return 'externalLink'
+    case 'markdown':
+      return 'markdown'
+    case 'sheet':
+      return 'sheet'
     default:
-      return "markdown"
+      return 'markdown'
   }
 }
 
 export type RSVP = {
   isEnabled: boolean
-  type: "externalLink" | "markdown" | "sheet"
+  type: 'externalLink' | 'markdown' | 'sheet'
   externalLink: string
   sheet: string
   markdown: string
@@ -117,8 +115,7 @@ export const parseRSVP = (data: any = {}): RSVP => ({
   type: parseRSVPType(data.type),
   externalLink: parseString(data.externalLink),
   sheet: parseString(data.sheet),
-  markdown: parseString(data.markdown)
-
+  markdown: parseString(data.markdown),
 })
 
 export type Story = {
