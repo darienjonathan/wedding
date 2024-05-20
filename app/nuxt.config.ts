@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   nitro: {
     firebase: {
       gen: 2,
+      nodeVersion: '20',
       httpsOptions: {
         region: 'asia-southeast2',
       },
