@@ -7,27 +7,20 @@
 <script lang="ts" setup>
 import { useInjectLoading } from '~/composables/dependencyInjection/useLoadingDependencyInjection'
 
-interface Props {
-  width: string
-  height: string
-}
-defineProps({
-  width: {
-    type: String as () => Props['width'],
-    default: '',
-  },
-  height: {
-    type: String as () => Props['height'],
-    default: '',
-  },
+defineOptions({
+  name: 'ALoading',
 })
 
-const { loadingType } = useInjectLoading()
-</script>
-<script lang="ts">
-export default {
-  name: 'ALoading',
+type Props = {
+  width?: string
+  height?: string
 }
+
+withDefaults(defineProps<Props>(), {
+  width: '',
+  height: '',
+})
+const { loadingType } = useInjectLoading()
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

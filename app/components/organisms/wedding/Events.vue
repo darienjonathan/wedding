@@ -44,25 +44,20 @@ import { useMap } from '~/composables/wedding/useMap'
 import type { RSVP, SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
+defineOptions({
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Events',
+})
+
 type Props = {
   weddingEvents: Array<WeddingEvent>
-  rsvp: RSVP
+  rsvp: RSVP | null
   sectionSettings: SectionSettings | null
 }
 
-const props = defineProps({
-  weddingEvents: {
-    type: Array as () => Props['weddingEvents'],
-    default: [],
-  },
-  rsvp: {
-    type: Object as () => Props['rsvp'],
-    default: null
-  },
-  sectionSettings: {
-    type: Object as () => Props['sectionSettings'],
-    required: true,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  weddingEvents: () => [],
+  rsvp: null,
 })
 
 // SETTINGS
@@ -82,20 +77,18 @@ const { mapElementRefs } = useMap(toRef(props, 'weddingEvents'))
 // RSVP
 const markdown = ref()
 
-watch(() => props.rsvp, async (rsvp): Promise<void> => {
-  if (!rsvp?.isEnabled) return
-  if (!rsvp?.markdown) return
+watch(
+  () => props.rsvp,
+  async (rsvp): Promise<void> => {
+    if (!rsvp?.isEnabled) return
+    if (!rsvp?.markdown) return
 
-  markdown.value = await (await fetch(rsvp.markdown)).text()
-}, {
-  immediate: true
-})
-</script>
-<script lang="ts">
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Events',
-}
+    markdown.value = await (await fetch(rsvp.markdown)).text()
+  },
+  {
+    immediate: true,
+  }
+)
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';
@@ -326,6 +319,11 @@ $reversed-content-class: ".content[data-order='reverse']";
       border-radius: 4px;
       white-space: pre-wrap;
       word-wrap: break-word;
+    }
+
+    :deep(code) {
+      @include font-family('cabin');
+      @include font($size: $font-sm);
     }
   }
 }

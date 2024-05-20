@@ -17,7 +17,7 @@ class FirestoreCollection<T extends Record<string, any>> {
   public constructor(
     path: string,
     triggerPath: string,
-    parse: (data: FirebaseFirestore.DocumentData) => T
+    parse: (data: FirebaseFirestore.DocumentData) => T,
   ) {
     this.path = path
     this._trigger = new FirestoreTrigger(triggerPath, parse)
@@ -50,7 +50,7 @@ class FirestoreCollection<T extends Record<string, any>> {
    */
   private async deleteQueryBatch(
     query: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query,
-    resolve: () => void
+    resolve: () => void,
   ) {
     const batch = FirestoreCollection.batch()
     const snapshot = await query.get()
@@ -80,7 +80,7 @@ class FirestoreCollection<T extends Record<string, any>> {
     querySnapshot.forEach(queryDocSnapshot =>
       m.set(queryDocSnapshot.id, {
         ...this.parse(queryDocSnapshot.data()),
-      })
+      }),
     )
     return m
   }
@@ -101,7 +101,7 @@ class FirestoreCollection<T extends Record<string, any>> {
 
   public subscribeCollection(
     fn: (data: Map<string, T> | null) => void,
-    query?: FirestoreQueryBuilder<T>
+    query?: FirestoreQueryBuilder<T>,
   ) {
     const q = query ? query.build(this.ref) : this.ref
     return q.onSnapshot(querySnapshot => {

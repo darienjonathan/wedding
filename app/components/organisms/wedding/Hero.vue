@@ -42,15 +42,17 @@ import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
+defineOptions({
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Hero',
+})
+
 type Props = {
   weddingSettings: WeddingSettings | null
 }
 
-const props = defineProps({
-  weddingSettings: {
-    type: Object as () => Props['weddingSettings'],
-    default: null,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  weddingSettings: null,
 })
 
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
@@ -90,9 +92,7 @@ onUnmounted(() => {
 // Events
 // --------------------------------------------------
 
-const { isWeddingEventsSectionShown } = useWeddingSettings(
-  toRef(props, 'weddingSettings'),
-)
+const { isWeddingEventsSectionShown } = useWeddingSettings(toRef(props, 'weddingSettings'))
 
 const dayjs = useNuxtApp().$dayjs
 
@@ -168,12 +168,6 @@ onUnmounted(() => {
   if (!buttonObserverInstance.value) return
   buttonObserverInstance.value.disconnect()
 })
-</script>
-<script lang="ts">
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Hero',
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

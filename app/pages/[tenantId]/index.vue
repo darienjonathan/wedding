@@ -47,18 +47,23 @@
         Footer.footer(:type="weddingSettings.footer.type")
 </template>
 <script lang="ts" setup>
-import AboutUs from '~/components/organisms/wedding/AboutUs.vue'
+import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import type EventsType from '~/components/organisms/wedding/Events.vue'
 import Events from '~/components/organisms/wedding/Events.vue'
+import AboutUs from '~/components/organisms/wedding/AboutUs.vue'
 import Hero from '~/components/organisms/wedding/Hero.vue'
 import Registry from '~/components/organisms/wedding/Registry.vue'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import MPageLoading from '~~/components/molecules/MPageLoading.vue'
 import Closing from '~~/components/organisms/wedding/Closing.vue'
 import Footer from '~~/components/organisms/wedding/Footer.vue'
 import Gallery from '~~/components/organisms/wedding/Gallery.vue'
 import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import Wishes from '~~/components/organisms/wedding/Wishes.vue'
+
+defineOptions({
+  name: 'WeddingPage',
+})
 
 const route = useRoute()
 const tenantId = Array.isArray(route.params.tenantId)
@@ -115,10 +120,9 @@ const handleLoadingDone = () => {
   isHeroImageLoaded.value = true
 }
 
-const eventsElementRef = ref<InstanceType<typeof Events> | null>()
+const eventsElementRef = ref<InstanceType<typeof EventsType> | null>()
 const handleNavClick = () => {
   if (!eventsElementRef.value) return
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const element = eventsElementRef.value.$el as HTMLElement
   const eventsTop = element.getBoundingClientRect().top
   scrollTo(0, eventsTop)
@@ -135,7 +139,8 @@ const url = `${baseURL}/${tenantId}`
 const title = computed(() => `${weddingSettings?.value?.hero.title} | ${brand}`)
 
 const description = computed(
-  () => `The Wedding of ${weddingSettings.value?.hero.title} | ${weddingSettings?.value?.hero.invitationText}`
+  () =>
+    `The Wedding of ${weddingSettings.value?.hero.title} | ${weddingSettings?.value?.hero.invitationText}`
 )
 
 const image = computed(
@@ -193,23 +198,6 @@ useHead({
 definePageMeta({
   layout: 'base',
 })
-</script>
-<script lang="ts">
-export default {
-  name: 'WeddingPage',
-  components: {
-    MPageLoading,
-    Hero,
-    Events,
-    AboutUs,
-    OurStory,
-    Wishes,
-    Gallery,
-    Closing,
-    Registry,
-    Footer,
-  },
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

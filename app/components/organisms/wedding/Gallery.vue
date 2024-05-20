@@ -44,6 +44,11 @@ import ALoading from '~/components/atoms/ALoading.vue'
 import AModal from '~/components/atoms/AModal.vue'
 import type { Gallery, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
+defineOptions({
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Gallery',
+})
+
 type ImageState = {
   src: string
   order: number
@@ -171,12 +176,6 @@ const handleSelectImage = (imageState: ImageState) => {
 const handleCloseModal = () => {
   selectedImage.value = undefined
   isModalOpen.value = false
-}
-</script>
-<script lang="ts">
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Gallery',
 }
 </script>
 <style lang="scss" scoped>

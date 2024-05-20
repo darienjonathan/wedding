@@ -27,16 +27,7 @@ type Props = {
   sectionSettings: SectionSettings
 }
 
-const props = defineProps({
-  couple: {
-    type: [Object as () => Props['couple'], Object as () => Props['couple']],
-    required: true,
-  },
-  sectionSettings: {
-    type: Object as () => Props['sectionSettings'],
-    required: true,
-  },
-})
+const props = defineProps<Props>()
 
 /**
  * Download Images

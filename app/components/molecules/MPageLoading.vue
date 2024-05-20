@@ -10,11 +10,15 @@
 <script lang="ts" setup>
 import ALoading from '~/components/atoms/ALoading.vue'
 
-const props = defineProps({
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
+defineOptions({
+  name: 'MPageLoading',
+})
+
+type Props = {
+  isLoading: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  isLoading: false,
 })
 
 const { defineViewportVariables } = useViewportUnitSizes(false)
@@ -58,12 +62,6 @@ const unwatch = watch(
 onUnmounted(() => {
   unwatch()
 })
-</script>
-<script lang="ts">
-export default {
-  name: 'MPageLoading',
-  components: { ALoading },
-}
 </script>
 <style lang="scss" scoped>
 @import '~/assets/css/main';

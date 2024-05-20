@@ -10,7 +10,7 @@ const weddingSettings = (tenantId: string) =>
   new FirestoreWrapper<WeddingSettings>(
     `wedding/${tenantId}/weddingSettings`,
     `wedding/${tenantId}/weddingSettings/{weddingSettingsUid}`,
-    parseWeddingSettings
+    parseWeddingSettings,
   )
 
 export { wedding, weddingSettings }

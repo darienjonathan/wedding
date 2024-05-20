@@ -1,21 +1,22 @@
+import type {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  Unsubscribe
+} from 'firebase/firestore';
 import {
   addDoc,
   collection,
-  CollectionReference,
   deleteDoc,
   doc,
-  DocumentData,
-  DocumentReference,
   getDoc,
   getDocs,
   onSnapshot,
-  QueryDocumentSnapshot,
-  QuerySnapshot,
   setDoc,
-  updateDoc,
-  Unsubscribe,
+  updateDoc
 } from 'firebase/firestore'
-import { Ref } from 'nuxt/dist/app/compat/capi'
 import useFirestoreQueryBuilder from '~/composables/firebase/firestore/useFirestoreQueryBuilder'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

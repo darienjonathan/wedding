@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import type dayjs from 'dayjs'
 import { getNumDigits } from '~/utils/number'
 
 export const digitNum = {

@@ -1,15 +1,14 @@
+import type { CollectionReference, Query, QueryConstraint } from 'firebase/firestore'
 import {
-  CollectionReference,
   documentId,
   limit as limitFn,
   orderBy as orderByFn,
-  Query,
   query,
   where,
 } from 'firebase/firestore'
-import { Unpacked } from '~/types/common'
+import type { Unpacked } from '~/types/common'
 
-export interface Queries {
+export type Queries = {
   whereArgsArr: Parameters<typeof where>[]
   orderByArgs: Parameters<typeof orderByFn> | null
   limitArgs: number
@@ -67,10 +66,10 @@ const useFirestoreQueryBuilder = <T>(firestoreRef: CollectionReference<T>) => {
   }
 
   const build = (): Query<T> => {
-    const whereQueryArr = queries.whereArgsArr.map(([fieldPath, opStr, val]) =>
-      where(fieldPath, opStr, val)
+    const queryConstraints: QueryConstraint[] = []
+    queryConstraints.push(
+      ...queries.whereArgsArr.map(([fieldPath, opStr, val]) => where(fieldPath, opStr, val))
     )
-    const queryConstraints = [...whereQueryArr]
     if (queries.orderByArgs) queryConstraints.push(orderByFn(...queries.orderByArgs))
     if (queries.limitArgs) queryConstraints.push(limitFn(queries.limitArgs))
     return query(firestoreRef, ...queryConstraints.filter(q => q))

@@ -32,20 +32,17 @@
 import StoryModal from '~/components/organisms/wedding/StoryModal.vue'
 import type { SectionSettings, Story } from '~/types/model/wedding/weddingSettings'
 
+defineOptions({
+  name: 'OurStory',
+})
+
 type Props = {
   stories: Story[]
   sectionSettings: SectionSettings
 }
 
-const props = defineProps({
-  stories: {
-    type: Array as () => Props['stories'],
-    default: () => [],
-  },
-  sectionSettings: {
-    type: Object as () => Props['sectionSettings'],
-    required: true,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  stories: () => [],
 })
 
 /**
@@ -65,12 +62,6 @@ const handleStoryClick = (index: number) => {
 const handleCloseStoryModal = () => {
   selectedStoryIndex.value = undefined
   isStoryModalOpen.value = false
-}
-</script>
-<script lang="ts">
-export default {
-  name: 'OurStory',
-  components: { StoryModal },
 }
 </script>
 <style lang="scss" scoped>

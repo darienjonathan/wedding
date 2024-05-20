@@ -1,6 +1,6 @@
 // https://v3.nuxtjs.org/docs/directory-structure/nuxt.config
 export default defineNuxtConfig({
-  modules: ['@pinia/nuxt', '@nuxt/image'],
+  modules: ['@pinia/nuxt', '@nuxt/image', '@nuxt/eslint'],
   build: {
     transpile: ['@googlemaps/js-api-loader'],
   },
@@ -47,7 +47,7 @@ export default defineNuxtConfig({
       },
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
       baseURL: process.env.BASE_URL,
-      brand: 'dolciwedding.id'
+      brand: 'dolciwedding.id',
     },
     functionsBaseURL: process.env.FIREBASE_FUNCTIONS_BASE_API_URL,
   },

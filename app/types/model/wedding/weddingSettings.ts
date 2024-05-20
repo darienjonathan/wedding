@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { parseArray, parseBoolean, parseNumber, parseString } from '~/types/model/parse'
 
@@ -89,24 +88,24 @@ export const parsePerson = (data: any = {}): Person => ({
   imageSrc: parseString(data.imageSrc),
 })
 
-export type RSVPType = "externalLink" | "markdown" | "sheet"
+export type RSVPType = 'externalLink' | 'markdown' | 'sheet'
 
-export const parseRSVPType = (data: any = ""): RSVPType => {
+export const parseRSVPType = (data: any = ''): RSVPType => {
   switch(data) {
-    case "externalLink":
-      return "externalLink"
-    case "markdown":
-      return "markdown"
-    case "sheet":
-      return "sheet"
+    case 'externalLink':
+      return 'externalLink'
+    case 'markdown':
+      return 'markdown'
+    case 'sheet':
+      return 'sheet'
     default:
-      return "markdown"
+      return 'markdown'
   }
 }
 
 export type RSVP = {
   isEnabled: boolean
-  type: "externalLink" | "markdown" | "sheet"
+  type: 'externalLink' | 'markdown' | 'sheet'
   externalLink: string
   sheet: string
   markdown: string

@@ -21,29 +21,17 @@
 <script lang="ts" setup>
 import { useModalStore } from '~/store'
 
-interface Props {
+type Props = {
   type: 'default' | 'full-size' | 'auto' | 'frameless'
-  width: string
-  height: string
+  width?: string
+  height?: string
   isOpen: boolean
 }
-const props = defineProps({
-  type: {
-    type: String as () => Props['type'],
-    default: 'default',
-  },
-  width: {
-    type: String as () => Props['width'],
-    default: '',
-  },
-  height: {
-    type: String as () => Props['height'],
-    default: '',
-  },
-  isOpen: {
-    type: Boolean as () => Props['isOpen'],
-    default: false,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  type: 'default',
+  width: '',
+  height: '',
+  isOpen: false,
 })
 
 const modalStore = useModalStore()
