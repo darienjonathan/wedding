@@ -1,0 +1,19 @@
+{
+  "name": "wedding/darien-daisy/gallery/image_1.jpg",
+  "bucket": "wedding-5c92d.appspot.com",
+  "metageneration": 1,
+  "generation": 1709692437907,
+  "contentType": "image/jpeg",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "ff2e5d32-53c3-47b6-84fd-4626f502d1e1"
+  ],
+  "etag": "IWuLcsqpIiP9mLpw32u10427N18",
+  "customMetadata": {},
+  "timeCreated": "2024-03-06T02:33:57.907Z",
+  "updated": "2024-03-06T02:33:57.907Z",
+  "size": 947549,
+  "md5Hash": "n7GbLAb//pGkkCOHIJWE3A==",
+  "crc32c": "2041681057"
+}
