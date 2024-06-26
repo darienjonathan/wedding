@@ -2,14 +2,29 @@
 
 import { parseArray, parseBoolean, parseNumber, parseString } from '~/types/model/parse'
 
-// Invitees that is invited to reception is considered to be invited to matrimony as well
-export type InvitationType = 'reception' | 'matrimony' | null
+/*type of Invitation */
+export const InvitationTypes = {
+  /* this event is shown to everyone */
+  public: 'public',
+  /* this event is only shown to invitees; RSVP not required */
+  limitedNonRSVP: 'limitedNonRSVP',
+  /* this event is only shown to invitees; RSVP is required */
+  limitedRSVP: 'limitedRSVP',
+} as const
 
-export const parseInvitationType = (invitationType: any): InvitationType => {
-  const stringifiedType = parseString(invitationType)
-  if (stringifiedType === 'reception') return 'reception'
-  if (stringifiedType === 'matrimony') return 'matrimony'
-  return null
+export type InvitationType = (typeof InvitationTypes)[keyof typeof InvitationTypes]
+
+export const parseInvitationType = (data: any = {}): InvitationType => {
+  switch (data) {
+    case 'public':
+      return InvitationTypes.public
+    case 'limitedNonRSVP':
+      return InvitationTypes.limitedNonRSVP
+    case 'limitedRSVP':
+      return InvitationTypes.limitedRSVP
+    default:
+      return InvitationTypes.public
+  }
 }
 
 export type WeddingEvent = {
@@ -23,9 +38,7 @@ export type WeddingEvent = {
   timezone: string
   streamingLink: string
   invitation: {
-    isUsing: boolean
     type: InvitationType
-    isDetailed: boolean
     deadlineTimestamp: number
   }
 }
@@ -44,11 +57,46 @@ export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
   timezone: parseString(data.timezone),
   streamingLink: parseString(data.streamingLink),
   invitation: {
-    isUsing: parseBoolean(data.invitation?.isUsing),
     type: parseInvitationType(data.invitation?.type),
-    isDetailed: parseBoolean(data.invitation?.isDetailed),
     deadlineTimestamp: parseNumber(data.invitation?.deadlineTimestamp),
   },
+})
+
+/*types of RSVP */
+export const RSVPTypes = {
+  /* externalLink: show external link (e.g. Google Form) */
+  markdown: 'markdown',
+  /* markdown: shows a markdown text on the RSVP section */
+  externalLink: 'externalLink',
+  /* sheet: show a form that integrates with Google Sheet */
+  sheet: 'sheet',
+} as const
+
+export type RSVPType = (typeof RSVPTypes)[keyof typeof RSVPTypes]
+
+export const parseRSVPType = (data: any = {}): RSVPType => {
+  switch (data) {
+    case 'markdown':
+      return RSVPTypes.markdown
+    case 'externalLink':
+      return RSVPTypes.externalLink
+    case 'sheet':
+      return RSVPTypes.sheet
+    default:
+      return RSVPTypes.markdown
+  }
+}
+
+export type RSVP = {
+  isEnabled: boolean
+  type: RSVPType
+  content: string
+}
+
+export const parseRSVP = (data: any = {}): RSVP => ({
+  isEnabled: parseBoolean(data.isEnabled),
+  type: parseRSVPType(data.type),
+  content: parseString(data.content),
 })
 
 export type Parent = {
@@ -85,37 +133,6 @@ export const parsePerson = (data: any = {}): Person => ({
   childOrder: parseNumber(data.childOrder),
   parents: [parseParent(data.parents?.[0]), parseParent(data.parents?.[1])],
   imageSrc: parseString(data.imageSrc),
-})
-
-export type RSVPType = 'externalLink' | 'markdown' | 'sheet'
-
-export const parseRSVPType = (data: any = ''): RSVPType => {
-  switch (data) {
-    case 'externalLink':
-      return 'externalLink'
-    case 'markdown':
-      return 'markdown'
-    case 'sheet':
-      return 'sheet'
-    default:
-      return 'markdown'
-  }
-}
-
-export type RSVP = {
-  isEnabled: boolean
-  type: 'externalLink' | 'markdown' | 'sheet'
-  externalLink: string
-  sheet: string
-  markdown: string
-}
-
-export const parseRSVP = (data: any = {}): RSVP => ({
-  isEnabled: parseBoolean(data.isEnabled),
-  type: parseRSVPType(data.type),
-  externalLink: parseString(data.externalLink),
-  sheet: parseString(data.sheet),
-  markdown: parseString(data.markdown),
 })
 
 export type Story = {

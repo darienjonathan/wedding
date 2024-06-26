@@ -32,7 +32,7 @@
     .content
       .content__heading RSVP
       //- TODO: Other RSVP formats
-      template(v-if="rsvp?.markdown")
+      template(v-if="rsvp.type === RSVPTypes.markdown")
         .content__item
           .item__text
             .item__info
@@ -43,6 +43,7 @@ import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
 import type { RSVP, SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
+import { RSVPTypes } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -74,16 +75,16 @@ const getDate = (timestamp: number, timezone: string) => {
 
 const { mapElementRefs } = useMap(toRef(props, 'weddingEvents'))
 
-// RSVP
+// RSVP: Markdown
 const markdown = ref()
 
 watch(
   () => props.rsvp,
   async (rsvp): Promise<void> => {
-    if (!rsvp?.isEnabled) return
-    if (!rsvp?.markdown) return
+    if (!rsvp) return
+    if (rsvp.type !== RSVPTypes.markdown) return
 
-    markdown.value = await (await fetch(rsvp.markdown)).text()
+    markdown.value = await (await fetch(rsvp.content)).text()
   },
   {
     immediate: true,
