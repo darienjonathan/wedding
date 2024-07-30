@@ -2,53 +2,41 @@
 
 import { parseArray, parseBoolean, parseNumber, parseString } from '~/types/model/parse'
 
-// Invitees that is invited to reception is considered to be invited to matrimony as well
-export type InvitationType = 'reception' | 'matrimony' | null
+/*types of RSVP Forms */
+export const RSVPFormTypes = {
+  /* externalLink: show external link (e.g. Google Form) */
+  markdown: 'markdown',
+  /* markdown: shows a markdown text on the RSVP section */
+  externalLink: 'externalLink',
+  /* sheet: show a form that integrates with Google Sheet */
+  sheet: 'sheet',
+} as const
 
-export const parseInvitationType = (invitationType: any): InvitationType => {
-  const stringifiedType = parseString(invitationType)
-  if (stringifiedType === 'reception') return 'reception'
-  if (stringifiedType === 'matrimony') return 'matrimony'
-  return null
-}
+export type RSVPFormType = (typeof RSVPFormTypes)[keyof typeof RSVPFormTypes]
 
-export type WeddingEvent = {
-  id: string
-  eventName: string
-  venue: string
-  address: string
-  centerCoordinate: { lat: number; lng: number }
-  gmapsLink: string
-  timestamp: number
-  timezone: string
-  streamingLink: string
-  invitation: {
-    isUsing: boolean
-    type: InvitationType
-    isDetailed: boolean
-    deadlineTimestamp: number
+export const parseRSVPFormType = (data: any = {}): RSVPFormType => {
+  switch (data) {
+    case 'markdown':
+      return RSVPFormTypes.markdown
+    case 'externalLink':
+      return RSVPFormTypes.externalLink
+    case 'sheet':
+      return RSVPFormTypes.sheet
+    default:
+      return RSVPFormTypes.markdown
   }
 }
 
-export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
-  id: parseString(data.id),
-  eventName: parseString(data.eventName),
-  venue: parseString(data.venue),
-  address: parseString(data.address),
-  centerCoordinate: {
-    lat: parseNumber(data.centerCoordinate?.lat),
-    lng: parseNumber(data.centerCoordinate?.lng),
-  },
-  gmapsLink: parseString(data.gmapsLink),
-  timestamp: parseNumber(data.timestamp),
-  timezone: parseString(data.timezone),
-  streamingLink: parseString(data.streamingLink),
-  invitation: {
-    isUsing: parseBoolean(data.invitation?.isUsing),
-    type: parseInvitationType(data.invitation?.type),
-    isDetailed: parseBoolean(data.invitation?.isDetailed),
-    deadlineTimestamp: parseNumber(data.invitation?.deadlineTimestamp),
-  },
+export type RSVP = {
+  isEnabled: boolean
+  formType: RSVPFormType
+  content: string
+}
+
+export const parseRSVP = (data: any = {}): RSVP => ({
+  isEnabled: parseBoolean(data.isEnabled),
+  formType: parseRSVPFormType(data.formType),
+  content: parseString(data.content),
 })
 
 export type Parent = {
@@ -85,37 +73,6 @@ export const parsePerson = (data: any = {}): Person => ({
   childOrder: parseNumber(data.childOrder),
   parents: [parseParent(data.parents?.[0]), parseParent(data.parents?.[1])],
   imageSrc: parseString(data.imageSrc),
-})
-
-export type RSVPType = 'externalLink' | 'markdown' | 'sheet'
-
-export const parseRSVPType = (data: any = ''): RSVPType => {
-  switch (data) {
-    case 'externalLink':
-      return 'externalLink'
-    case 'markdown':
-      return 'markdown'
-    case 'sheet':
-      return 'sheet'
-    default:
-      return 'markdown'
-  }
-}
-
-export type RSVP = {
-  isEnabled: boolean
-  type: 'externalLink' | 'markdown' | 'sheet'
-  externalLink: string
-  sheet: string
-  markdown: string
-}
-
-export const parseRSVP = (data: any = {}): RSVP => ({
-  isEnabled: parseBoolean(data.isEnabled),
-  type: parseRSVPType(data.type),
-  externalLink: parseString(data.externalLink),
-  sheet: parseString(data.sheet),
-  markdown: parseString(data.markdown),
 })
 
 export type Story = {
@@ -194,7 +151,6 @@ export const parseSectionSettings = (data: any = {}): SectionSettings => ({
 
 export type WeddingSettings = {
   ogpImageSrc: string
-  weddingEvents: WeddingEvent[]
   couple: [Person, Person]
   rsvp: RSVP
   stories: Story[]
@@ -215,7 +171,6 @@ export type WeddingSettings = {
 
 export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   ogpImageSrc: parseString(data.ogpImageSrc),
-  weddingEvents: parseArray(data.weddingEvents, parseWeddingEvent),
   couple: [parsePerson(data.couple?.[0]), parsePerson(data.couple?.[1])],
   rsvp: parseRSVP(data.rsvp),
   stories: parseArray(data.stories, parseStory),

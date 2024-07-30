@@ -39,7 +39,8 @@
 </template>
 <script lang="ts" setup>
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
+import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
 defineOptions({
@@ -48,6 +49,7 @@ defineOptions({
 })
 
 type Props = {
+  weddingEvents: Record<string, WeddingEvent> | null
   weddingSettings: WeddingSettings | null
 }
 
@@ -66,6 +68,7 @@ const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
 const isBlur = ref(false)
 const observerElementRef = ref<HTMLDivElement>()
 const observerInstance = ref<IntersectionObserver>()
+
 onMounted(() => {
   if (!observerElementRef.value) return
   const observer = new IntersectionObserver(
@@ -92,12 +95,15 @@ onUnmounted(() => {
 // Events
 // --------------------------------------------------
 
-const { isWeddingEventsSectionShown } = useWeddingSettings(toRef(props, 'weddingSettings'))
+const { isWeddingEventsSectionShown } = useWeddingSettings(
+  toRef(props, 'weddingSettings'),
+  toRef(props, 'weddingEvents'),
+)
 
 const dayjs = useNuxtApp().$dayjs
 
 const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => boolean) => {
-  const events = [...(props.weddingSettings?.weddingEvents || [])]
+  const events = Object.values(props.weddingEvents || {})
   let nextEvents = events.filter(
     weddingEvent =>
       (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp)),

@@ -7,7 +7,7 @@
     .kv__main {{ sectionSettings?.description.main }}
     .kv__sub {{ sectionSettings?.description.sub }}
 
-  template(v-for="(weddingEvent, index) in weddingEvents")
+  template(v-for="(weddingEvent, index) in weddingEventList")
     .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
       .content__heading {{ weddingEvent.eventName }}
       .content__item
@@ -28,11 +28,11 @@
           ref="mapElementRefs"
           :data-index="index"
         )
-  template(v-if="rsvp?.isEnabled")
+  template(v-if="rsvp && hasRSVP")
     .content
       .content__heading RSVP
       //- TODO: Other RSVP formats
-      template(v-if="rsvp?.markdown")
+      template(v-if="rsvp.type === RSVPTypes.markdown")
         .content__item
           .item__text
             .item__info
@@ -41,8 +41,10 @@
 <script lang="ts" setup>
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
-import type { RSVP, SectionSettings, WeddingEvent } from '~/types/model/wedding/weddingSettings'
+import type { RSVP, SectionSettings } from '~/types/model/wedding/weddingSettings'
+import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import { getTimezoneText } from '~/utils/time'
+import { RSVPFormTypes } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -50,7 +52,7 @@ defineOptions({
 })
 
 type Props = {
-  weddingEvents: Array<WeddingEvent>
+  weddingEventsRecord: Record<string, WeddingEvent>
   rsvp: RSVP | null
   sectionSettings: SectionSettings | null
 }
@@ -59,6 +61,10 @@ const props = withDefaults(defineProps<Props>(), {
   weddingEvents: () => [],
   rsvp: null,
 })
+
+const weddingEventList = computed(() =>
+  [...Object.values(props.weddingEventsRecord)].sort((a, b) => a.order - b.order),
+)
 
 // SETTINGS
 
@@ -72,18 +78,23 @@ const getDate = (timestamp: number, timezone: string) => {
   return `${date} ${offset}`
 }
 
-const { mapElementRefs } = useMap(toRef(props, 'weddingEvents'))
+const { mapElementRefs } = useMap(weddingEventList)
 
 // RSVP
+
+const hasRSVP = computed(
+  () => !!props.rsvp?.isEnabled && weddingEventList.value.some(weddingEvent => !!weddingEvent.rsvp),
+)
+
 const markdown = ref()
 
 watch(
   () => props.rsvp,
   async (rsvp): Promise<void> => {
-    if (!rsvp?.isEnabled) return
-    if (!rsvp?.markdown) return
+    if (!rsvp) return
+    if (rsvp.formType !== RSVPFormTypes.markdown) return
 
-    markdown.value = await (await fetch(rsvp.markdown)).text()
+    markdown.value = await (await fetch(rsvp.content)).text()
   },
   {
     immediate: true,

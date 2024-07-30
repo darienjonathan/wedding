@@ -1,5 +1,5 @@
-import type { WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import useGoogleMaps from '~/composables/useMap'
+import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 
 export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
   const { loader } = useGoogleMaps()

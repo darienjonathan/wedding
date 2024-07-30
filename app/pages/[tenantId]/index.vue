@@ -5,6 +5,7 @@
     .wrapper
       Hero.hero(
         :weddingSettings="weddingSettings"
+        :weddingEvents="weddingEvents"
         @nav-click="handleNavClick"
         @loading-done="handleLoadingDone"
       )
@@ -15,8 +16,8 @@
           :sectionSettings="weddingSettings.sectionSettings.couple"
         )
         Events.events(
-          v-if="isWeddingEventsSectionShown"
-          :weddingEvents="weddingSettings.weddingEvents"
+          v-if="isWeddingEventsSectionShown && weddingEvents"
+          :weddingEventsRecord="weddingEvents"
           :rsvp="weddingSettings.rsvp"
           :sectionSettings="weddingSettings.sectionSettings.weddingEvents"
           ref="eventsElementRef"
@@ -47,7 +48,6 @@
         Footer.footer(:type="weddingSettings.footer.type")
 </template>
 <script lang="ts" setup>
-import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import type EventsType from '~/components/organisms/wedding/Events.vue'
 import Events from '~/components/organisms/wedding/Events.vue'
 import AboutUs from '~/components/organisms/wedding/AboutUs.vue'
@@ -60,6 +60,8 @@ import Footer from '~~/components/organisms/wedding/Footer.vue'
 import Gallery from '~~/components/organisms/wedding/Gallery.vue'
 import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import Wishes from '~~/components/organisms/wedding/Wishes.vue'
+import type { FetchWeddingEventsResponse } from '~/server/api/fetchWeddingEvents'
+import type { FetchWeddigSettingsResponse } from '~/server/api/fetchWeddingSettings'
 
 defineOptions({
   name: 'WeddingPage',
@@ -71,18 +73,28 @@ const tenantId = Array.isArray(route.params.tenantId)
   : route.params.tenantId
 
 // --------------------------------------------------
-// Wedding Settings
+// Server Side
 // --------------------------------------------------
 
-const { data: weddingSettings, status: weddingSettingsFetchStatus } =
-  await useFetch<WeddingSettings>('/api/fetchWeddingSettings', {
-    query: { tenantId },
-  })
+const { data: response, status } = await useAsyncData<{
+  weddingSettings: FetchWeddigSettingsResponse
+  weddingEvents: FetchWeddingEventsResponse
+}>('data', async () => {
+  const [weddingSettingsResponse, weddingEventsResponse] = await Promise.all([
+    $fetch(`/api/fetchWeddingSettings?tenantId=${tenantId}`),
+    $fetch(`/api/fetchWeddingEvents?tenantId=${tenantId}`),
+  ])
+
+  return {
+    weddingSettings: weddingSettingsResponse,
+    weddingEvents: weddingEventsResponse,
+  }
+})
 
 watch(
-  [weddingSettingsFetchStatus],
+  [status],
   () => {
-    if (weddingSettingsFetchStatus.value === 'error') {
+    if (status.value === 'error') {
       throw createError({
         fatal: true,
         statusCode: 404,
@@ -94,6 +106,9 @@ watch(
   },
 )
 
+const weddingSettings = computed(() => response.value?.weddingSettings ?? null)
+const weddingEvents = computed(() => response.value?.weddingEvents ?? null)
+
 const {
   isWeddingEventsSectionShown,
   isCoupleSectionShown,
@@ -102,7 +117,7 @@ const {
   isWishesSectionShown,
   isRegistrySectionShown,
   isClosingSectionShown,
-} = useWeddingSettings(weddingSettings)
+} = useWeddingSettings(weddingSettings, weddingEvents)
 
 // --------------------------------------------------
 // Client Side
