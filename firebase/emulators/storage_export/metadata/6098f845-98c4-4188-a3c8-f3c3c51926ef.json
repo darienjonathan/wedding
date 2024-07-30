@@ -1,0 +1,19 @@
+{
+  "name": "wedding/darien-daisy/kv.jpg",
+  "bucket": "wedding-5c92d.appspot.com",
+  "metageneration": 1,
+  "generation": 1709695601246,
+  "contentType": "image/jpeg",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "c863ce0f-0c22-430b-a727-4f53c573743b"
+  ],
+  "etag": "P8gwoCqj3IkHS1cTS1WCkdyNRfo",
+  "customMetadata": {},
+  "timeCreated": "2024-03-06T03:26:41.246Z",
+  "updated": "2024-03-06T03:26:41.246Z",
+  "size": 982855,
+  "md5Hash": "DPjElE7FZzKkN16yE7BDdQ==",
+  "crc32c": "342012055"
+}

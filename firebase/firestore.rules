@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    //-------------------------------------------------------------
+    // rules
+    //-------------------------------------------------------------
+
+    // Wedding
+
+    match /wedding/{tenantId}/weddingSettings/{weddingSettingsId} {
+      allow read: if true;
+    }
+
+    match /wedding/{tenantId}/invitees/{inviteeUid} {
+      allow read: if true;
+    }
+
+    match /wedding/{tenantId}/inviteeRSVP/{inviteeRSVPUid} {
+      allow read: if true;
+      allow write: if exists(/databases/$(database)/documents/wedding/$(tenantId)/invitees/$(inviteeRSVPUid));
+    }
+
+    match /wedding/{tenantId}/wishes/{wishUid} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if exists(/databases/$(database)/documents/wedding/$(tenantId)/wishes/$(wishUid));
+    }
+  }
+}

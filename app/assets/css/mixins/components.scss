@@ -1,0 +1,30 @@
+@import '../variables';
+
+@mixin line($orientation: x, $thickness: 1px, $length: 100%, $color: $white) {
+  background-color: $color;
+  @if $orientation == x {
+    @include size($length, $thickness);
+  } @else if $orientation == y {
+    @include size($thickness, $length);
+  }
+}
+
+@mixin button($color: $white, $bg-color, $border-radius: $radius-sm, $font-size: $font-m) {
+  padding: $font-size * 0.5 $font-size;
+  color: $color;
+  background-color: $bg-color;
+  border-radius: $border-radius;
+  font-size: $font-size;
+  cursor: pointer;
+  transition: filter 0.25s, background-color 0.25s;
+  &:hover {
+    filter: drop-shadow(0 0 2px $bg-color);
+  }
+  &:disabled {
+    background-color: mix($black, $white);
+    cursor: default;
+    &:hover {
+      filter: none;
+    }
+  }
+}
