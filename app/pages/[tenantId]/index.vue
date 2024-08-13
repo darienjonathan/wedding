@@ -7,7 +7,7 @@
           class="hero"
           :wedding-settings="weddingSettings"
           :wedding-events="weddingEvents"
-          @nav-cclick="handleNavClick"
+          @nav-click="handleNavClick"
           @loading-done="handleLoadingDone"
         >
         </PageHero>
