@@ -1,5 +1,6 @@
-<template lang="pug">
-.a-markdown(v-html="markdownHTML")
+<!-- eslint-disable vue/no-v-html -->
+<template>
+  <div class="a-markdown" v-html="markdownHTML" />
 </template>
 <script lang="ts" setup>
 const { $md } = useNuxtApp()

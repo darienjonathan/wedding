@@ -1,42 +1,61 @@
-<template lang="pug">
-.events
-  .heading__wrapper
-    .heading {{ sectionSettings?.title || 'EVENTS' }}
-
-  .kv
-    .kv__main {{ sectionSettings?.description.main }}
-    .kv__sub {{ sectionSettings?.description.sub }}
-
-  template(v-for="(weddingEvent, index) in weddingEventList")
-    .content(:data-order="index % 2 !== 0 ? 'reverse' : ''")
-      .content__heading {{ weddingEvent.eventName }}
-      .content__item
-        .item__text
-          .item__info
-            .info__main {{ weddingEvent.venue }}
-            .info__sub {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
-          template(v-if="weddingEvent.streamingLink")
-            .item__info
-              .info__sub {{ 'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:' }}
-              a.button(
-                :href="weddingEvent.streamingLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                role="button"
-              ) {{ 'Attend Online' }}
-        .item__graphic.item__graphic--map(
-          ref="mapElementRefs"
-          :data-index="index"
-        )
-  template(v-if="rsvp && hasRSVP")
-    .content
-      .content__heading RSVP
-      //- TODO: Other RSVP formats
-      template(v-if="rsvp.type === RSVPTypes.markdown")
-        .content__item
-          .item__text
-            .item__info
-              AMarkdown.info__markdown(:content="markdown")
+<template>
+  <div class="events">
+    <div class="heading__wrapper">
+      <div class="heading">{{ sectionSettings?.title || 'EVENTS' }}</div>
+    </div>
+    <div class="kv">
+      <div class="kv__main">{{ sectionSettings?.description.main }}</div>
+      <div class="kv__sub">{{ sectionSettings?.description.sub }}</div>
+    </div>
+    <template v-for="(weddingEvent, index) in weddingEventList" :key="weddingEvent.eventName">
+      <div class="content" :data-order="index % 2 !== 0 ? 'reverse' : ''">
+        <div class="content__heading">{{ weddingEvent.eventName }}</div>
+        <div class="content__item">
+          <div class="item__text">
+            <div class="item__info">
+              <div class="info__main">{{ weddingEvent.venue }}</div>
+              <div class="info__sub">
+                {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
+              </div>
+            </div>
+            <template v-if="weddingEvent.streamingLink">
+              <div class="item__info">
+                <div class="info__sub">
+                  {{
+                    'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:'
+                  }}
+                </div>
+                <a
+                  class="button"
+                  :href="weddingEvent.streamingLink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="button"
+                  >{{ 'Attend Online' }}</a
+                >
+              </div>
+            </template>
+          </div>
+          <div ref="mapElementRefs" class="item__graphic item__graphic--map" :data-index="index" />
+        </div>
+      </div>
+    </template>
+    <template v-if="rsvp && hasRSVP">
+      <div class="content">
+        <div class="content__heading">RSVP</div>
+        <!-- TODO: Other RSVP Formats -->
+        <template v-if="rsvp.formType === RSVPFormTypes.markdown">
+          <div class="content__item">
+            <div class="item__text">
+              <div class="item__info">
+                <AMarkdown class="info__markdown" :content="markdown" />
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
 </template>
 <script lang="ts" setup>
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
@@ -47,8 +66,7 @@ import { getTimezoneText } from '~/utils/time'
 import { RSVPFormTypes } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Events',
+  name: 'WeddingEvents',
 })
 
 type Props = {

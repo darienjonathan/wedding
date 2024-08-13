@@ -1,41 +1,57 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<template lang="pug">
-.hero
-  .hero__filler
-    .hero__button-intersection-observer(ref="buttonObserverElementRef")
-    .hero__intersection-observer(ref="observerElementRef")
-  .hero__content(:data-is-blur="isBlur")
-    NuxtImg.hero__image(
-      v-if="weddingSettings?.hero.imageSrc"
-      :src="weddingSettings?.hero.imageSrc"
-      @load="$emit('loadingDone')"
-    )
-    .hero__invitation-text.invitation-text
-      .invitation-text__item {{ weddingSettings?.hero.invitationText }}
-    .hero__kv.kv
-      template(v-if="weddingSettings?.hero.tagline.jp")
-        .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
-      template(v-if="weddingSettings?.hero.tagline.en")
-        .kv__subheading.kv__subheading--en {{ weddingSettings?.hero.tagline.en }}
-      .kv__heading {{ title }}
-      .kv__line
-      .kv__date {{ kvDate }}
-      template(v-if="isWeddingEventsSectionShown")
-        .kv__nav-btn
-          .nav-btn__icon.material-icons-outlined expand_more
-          .nav-btn__text(@click="emit('navClick')") {{ 'Events' }}
-
-    .bottom__wrapper
-      .bottom__buttons
-        a.bottom__button.bottom__button--right(
-          v-if="eventToShowStreaming"
-          :href="eventToShowStreaming.streamingLink"
-          :data-is-blur="isButtonBlur"
-          target="_blank"
-          rel="noopener noreferrer"
-          role="button"
-        ) {{ 'Attend Online' }}
-      .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
+<template>
+  <div class="hero">
+    <div class="hero__filler">
+      <div ref="buttonObserverElementRef" class="hero__button-intersection-observer" />
+      <div ref="observerElementRef" class="hero__intersection-observer" />
+    </div>
+    <div class="hero__content" :data-is-blur="isBlur">
+      <NuxtImg
+        v-if="weddingSettings?.hero.imageSrc"
+        class="hero__image"
+        :src="weddingSettings?.hero.imageSrc"
+        @load="$emit('loadingDone')"
+      />
+      <div class="hero__invitation-text invitation-text">
+        <div class="invitation-text__item">{{ weddingSettings?.hero.invitationText }}</div>
+      </div>
+      <div class="hero__kv kv">
+        <template v-if="weddingSettings?.hero.tagline.jp">
+          <div class="kv__subheading kv__subheading--jp">
+            {{ weddingSettings?.hero.tagline.jp }}
+          </div>
+        </template>
+        <template v-if="weddingSettings?.hero.tagline.en">
+          <div class="kv__subheading kv__subheading--en">
+            {{ weddingSettings?.hero.tagline.en }}
+          </div>
+        </template>
+        <div class="kv__heading">{{ title }}</div>
+        <div class="kv__line" />
+        <div class="kv__date">{{ kvDate }}</div>
+        <template v-if="isWeddingEventsSectionShown">
+          <div class="kv__nav-btn">
+            <div class="nav-btn__icon material-icons-outlined">expand_more</div>
+            <div class="nav-btn__text" @click="emit('navClick')">{{ 'Events' }}</div>
+          </div>
+        </template>
+      </div>
+      <div class="bottom__wrapper">
+        <div class="bottom__buttons">
+          <a
+            v-if="eventToShowStreaming"
+            class="bottom__button bottom__button--right"
+            :href="eventToShowStreaming.streamingLink"
+            :data-is-blur="isButtonBlur"
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+            >{{ 'Attend Online' }}</a
+          >
+        </div>
+        <div v-if="eventToShowStreaming" class="bottom__text">{{ streamingEventText }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
@@ -44,8 +60,7 @@ import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import { getTimezoneText } from '~/utils/time'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Hero',
+  name: 'PageHero',
 })
 
 type Props = {

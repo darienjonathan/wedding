@@ -1,43 +1,51 @@
-<template lang="pug">
-.gallery
-  .heading__wrapper
-    .heading {{ sectionSettings.title || 'GALLERY' }}
-  .kv
-    .kv__main {{ sectionSettings.description.main }}
-    .kv__sub {{ sectionSettings.description.sub }}
-  .content
-    .loading-wrapper(:data-loaded="isAllImageLoaded")
-      ALoading
-    .grid(
-      :data-loaded="isAllImageLoaded"
-      :data-layout-type="gallery.layoutType"
-    )
-      template(v-for="imageState in imageStates")
-        .image(
-          :class="`image--${imageState.order}`"
-          :data-order="imageState.order"
-          @click="handleSelectImage(imageState)"
-        )
-          NuxtImg(
-            ref="imgRefs"
-            :src="imageState.src"
-            loading="lazy"
-            @load="handleImageLoaded(imageState.order)"
-          )
-
-  template(v-if="selectedImage")
-    AModal(
-      :type="'frameless'"
-      :is-open="isModalOpen"
-      :width="selectedImage.width"
-      :height="selectedImage.height"
-      @close="handleCloseModal"
-    )
-      NuxtImg.modal__img(
-        v-if="selectedImage.src"
-        :src="selectedImage.src"
-        loading="lazy"
-      )
+<template>
+  <div class="gallery">
+    <div class="heading__wrapper">
+      <div class="heading">{{ sectionSettings.title || 'GALLERY' }}</div>
+    </div>
+    <div class="kv">
+      <div class="kv__main">{{ sectionSettings.description.main }}</div>
+      <div class="kv__sub">{{ sectionSettings.description.sub }}</div>
+    </div>
+    <div class="content">
+      <div class="loading-wrapper" :data-loaded="isAllImageLoaded">
+        <ALoading />
+      </div>
+      <div class="grid" :data-loaded="isAllImageLoaded" :data-layout-type="gallery.layoutType">
+        <template v-for="imageState in imageStates" :key="imageState.order">
+          <div
+            class="image"
+            :class="`image--${imageState.order}`"
+            :data-order="imageState.order"
+            @click="handleSelectImage(imageState)"
+          >
+            <NuxtImg
+              ref="imgRefs"
+              :src="imageState.src"
+              loading="lazy"
+              @load="handleImageLoaded(imageState.order)"
+            />
+          </div>
+        </template>
+      </div>
+    </div>
+    <template v-if="selectedImage">
+      <AModal
+        :type="'frameless'"
+        :is-open="isModalOpen"
+        :width="selectedImage.width"
+        :height="selectedImage.height"
+        @close="handleCloseModal"
+      >
+        <NuxtImg
+          v-if="selectedImage.src"
+          class="modal__img"
+          :src="selectedImage.src"
+          loading="lazy"
+        />
+      </AModal>
+    </template>
+  </div>
 </template>
 <script lang="ts" setup>
 import ALoading from '~/components/atoms/ALoading.vue'
@@ -45,8 +53,7 @@ import AModal from '~/components/atoms/AModal.vue'
 import type { Gallery, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Gallery',
+  name: 'ImageGallery',
 })
 
 type ImageState = {

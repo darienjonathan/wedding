@@ -1,22 +1,35 @@
-<template lang="pug">
-.about-us
-  .heading__wrapper
-    .heading {{ sectionSettings.title || 'BRIDE & GROOM' }}
-  .kv
-    .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
-    .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
-  .biodata
-    template(v-for="(person, index) in couple")
-      .biodata__item(:data-order="index % 2 !== 0 ? 'reverse' : ''")
-        NuxtImg.biodata__image(
-          v-if="person.imageSrc"
-          :src="person.imageSrc"
-          loading="lazy"
-        )
-        .biodata__info
-          .biodata__name {{ getFormattedName(person) }}
-          .biodata__parents
-            .biodata__parent {{ getPersonBiodata(person) }}
+<template>
+  <div class="about-us">
+    <div class="heading-wrapper">
+      <div class="heading">{{ sectionSettings.title || 'BRIDE & GROOM' }}</div>
+    </div>
+    <div class="kv">
+      <div v-if="sectionSettings.description.main" class="kv__main">
+        {{ sectionSettings.description.main }}
+      </div>
+      <div v-if="sectionSettings.description.sub" class="kv__sub">
+        {{ sectionSettings.description.sub }}
+      </div>
+    </div>
+    <div class="biodata">
+      <template v-for="(person, index) in couple" :key="index">
+        <div class="biodata__item" :data-order="index % 2 !== 0 ? 'reverse' : ''">
+          <NuxtImg
+            v-if="person.imageSrc"
+            class="biodata__image"
+            :src="person.imageSrc"
+            loading="lazy"
+          />
+          <div class="biodata__info">
+            <div class="biodata__name">{{ getFormattedName(person) }}</div>
+            <div class="biodata__parents">
+              <div class="biodata__parent">{{ getPersonBiodata(person) }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import type { Person, SectionSettings } from '~/types/model/wedding/weddingSettings'
@@ -27,7 +40,7 @@ type Props = {
   sectionSettings: SectionSettings
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 /**
  * Download Images

@@ -1,17 +1,14 @@
-<template lang="pug">
-.m-input
-  .input__label {{ label }}
-  .input__item
-    slot
-  .input__notes
-    .note(
-      data-type="note"
-      v-if="!!noteText"
-    ) {{ noteText }}
-    .note(
-      data-type="error"
-      v-if="!!errorText"
-    ) {{ errorText }}
+<template>
+  <div class="m-input">
+    <div class="input__label">{{ label }}</div>
+    <div class="input__item">
+      <slot />
+    </div>
+    <div class="input__notes">
+      <div v-if="!!noteText" class="note" data-type="note">{{ noteText }}</div>
+      <div v-if="!!errorText" class="note" data-type="error">{{ errorText }}</div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 defineOptions({

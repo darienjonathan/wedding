@@ -1,8 +1,5 @@
-<template lang="pug">
-.loading(
-  :style="{ width, height }"
-  :data-type="loadingType"
-)
+<template>
+  <div class="loading" :style="{ width, height }" :data-type="loadingType" />
 </template>
 <script lang="ts" setup>
 import { useInjectLoading } from '~/composables/dependencyInjection/useLoadingDependencyInjection'

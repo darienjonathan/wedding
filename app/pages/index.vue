@@ -1,10 +1,18 @@
-<template lang="pug">
-.wrapper
-  .container
-    img.logo(src="~/assets/images/brand/brand_light.svg")
-    a.link(href="https://github.com/darienjonathan/wedding" target="_blank" rel="noreferrer noopener") 
-      img.link__icon(src="~/assets/images/sns/icon-github.png")
-      .link__text darienjonathan/wedding
+<template>
+  <div class="wrapper">
+    <div class="container">
+      <img class="logo" src="~/assets/images/brand/brand_light.svg" />
+      <a
+        class="link"
+        href="https://github.com/darienjonathan/wedding"
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        <img class="link__icon" src="~/assets/images/sns/icon-github.png" />
+        <div class="link__text">darienjonathan/wedding</div>
+      </a>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 definePageMeta({
