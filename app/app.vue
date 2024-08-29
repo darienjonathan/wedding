@@ -1,23 +1,15 @@
-<template lang="pug">
-div
-  Head
-    Title {{ title }}
-    Link(
-      rel="canonical"
-      :href="url"
-    )
-    Link(
-      rel="icon"
-      href="favicon_dark.ico"
-      media="(prefers-color-scheme: dark)"
-    )
-    Link(
-      rel="icon"
-      href="favicon_light.ico"
-      media="(prefers-color-scheme: light)"
-    )
-  NuxtLayout
-    NuxtPage
+<template>
+  <div>
+    <Head>
+      <Title>{{ title }}</Title>
+      <Link rel="canonical" :href="url" />
+      <Link rel="icon" href="favicon_dark.ico" media="(prefers-color-scheme: dark)" />
+      <Link rel="icon" href="favicon_light.ico" media="(prefers-color-scheme: light)" />
+    </Head>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
 </template>
 <script lang="ts" setup>
 const { baseURL: url, brand: title } = useRuntimeConfig().public

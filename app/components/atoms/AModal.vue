@@ -1,16 +1,18 @@
 <template>
-  <div v-show="isOpen" class="a-modal">
-    <transition name="fade" appear @after-leave="$emit('close')">
-      <div v-show="isModalOpen" class="overlay" @click="handleClose">
-        <div class="wrapper" :style="{ width, height }" :data-type="type" @click.stop>
-          <slot />
-          <div class="close__btn" @click="handleClose">
-            <div class="close__icon material-icons-outlined">close</div>
+  <teleport to="body">
+    <div v-show="isOpen" class="a-modal">
+      <transition name="fade" appear @after-leave="$emit('close')">
+        <div v-show="isModalOpen" class="overlay" @click="handleClose">
+          <div class="wrapper" :style="{ width, height }" :data-type="type" @click.stop>
+            <slot />
+            <div class="close__btn" @click="handleClose">
+              <div class="close__icon material-icons-outlined">close</div>
+            </div>
           </div>
         </div>
-      </div>
-    </transition>
-  </div>
+      </transition>
+    </div>
+  </teleport>
 </template>
 <script lang="ts" setup>
 import { useModalStore } from '~/store'
@@ -20,7 +22,7 @@ import { useModalStore } from '~/store'
  */
 
 type Props = {
-  type: 'default' | 'full-size' | 'auto' | 'frameless'
+  type?: 'default' | 'full-size' | 'auto' | 'frameless'
   width?: string
   height?: string
   isOpen: boolean

@@ -149,6 +149,18 @@ export const parseSectionSettings = (data: any = {}): SectionSettings => ({
   },
 })
 
+// Event's viewability is controlled by WeddingEvent, hence "isExclusiveToInvitees" is not needed
+export type EventsSectionSettings = Omit<SectionSettings, 'isExclusiveToInvitees'>
+
+export const parseEventsSectionSettings = (data: any = {}): EventsSectionSettings => ({
+  isEnabled: parseBoolean(data.isEnabled),
+  title: parseString(data.title),
+  description: {
+    main: parseString(data.description?.main),
+    sub: parseString(data.description?.sub),
+  },
+})
+
 export type WeddingSettings = {
   ogpImageSrc: string
   couple: [Person, Person]
@@ -159,7 +171,7 @@ export type WeddingSettings = {
   hero: Hero
   footer: Footer
   sectionSettings: {
-    weddingEvents: SectionSettings
+    weddingEvents: EventsSectionSettings
     couple: SectionSettings
     story: SectionSettings
     gallery: SectionSettings
@@ -179,7 +191,7 @@ export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   hero: parseHero(data.hero),
   footer: parseFooter(data.footer),
   sectionSettings: {
-    weddingEvents: parseSectionSettings(data.sectionSettings?.weddingEvents),
+    weddingEvents: parseEventsSectionSettings(data.sectionSettings?.weddingEvents),
     couple: parseSectionSettings(data.sectionSettings?.couple),
     story: parseSectionSettings(data.sectionSettings?.story),
     gallery: parseSectionSettings(data.sectionSettings?.gallery),

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { parseNumber, parseString } from '~/types/model/parse'
+import { parseBoolean, parseNumber, parseString } from '~/types/model/parse'
 
 /*type of Invitation */
 export const RSVPTypes = {
@@ -25,6 +25,7 @@ export const parseInvitationType = (data: any = {}): RSVPType => {
 
 // Setting the type name to "Event" will make it conflict with the DOM Event
 export type WeddingEvent = {
+  isExclusiveToInvitees: boolean
   eventName: string
   venue: string
   address: string
@@ -42,6 +43,7 @@ export type WeddingEvent = {
 }
 
 export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
+  isExclusiveToInvitees: parseBoolean(data.isExclusiveToInvitees),
   eventName: parseString(data.eventName),
   venue: parseString(data.venue),
   address: parseString(data.address),
@@ -55,7 +57,9 @@ export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
   timezone: parseString(data.timezone),
   streamingLink: parseString(data.streamingLink),
   ...(data.rsvp && {
-    type: parseInvitationType(data.rsvp?.type),
-    deadlineTimestamp: parseNumber(data.rsvp?.deadlineTimestamp),
+    rsvp: {
+      type: parseInvitationType(data.rsvp?.type),
+      deadlineTimestamp: parseNumber(data.rsvp?.deadlineTimestamp),
+    },
   }),
 })

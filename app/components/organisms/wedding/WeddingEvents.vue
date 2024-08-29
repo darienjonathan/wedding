@@ -1,67 +1,81 @@
 <template>
-  <div class="events">
-    <div class="heading__wrapper">
-      <div class="heading">{{ sectionSettings?.title || 'EVENTS' }}</div>
-    </div>
-    <div class="kv">
-      <div class="kv__main">{{ sectionSettings?.description.main }}</div>
-      <div class="kv__sub">{{ sectionSettings?.description.sub }}</div>
-    </div>
-    <template v-for="(weddingEvent, index) in weddingEventList" :key="weddingEvent.eventName">
-      <div class="content" :data-order="index % 2 !== 0 ? 'reverse' : ''">
-        <div class="content__heading">{{ weddingEvent.eventName }}</div>
-        <div class="content__item">
-          <div class="item__text">
-            <div class="item__info">
-              <div class="info__main">{{ weddingEvent.venue }}</div>
-              <div class="info__sub">
-                {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
-              </div>
-            </div>
-            <template v-if="weddingEvent.streamingLink">
-              <div class="item__info">
-                <div class="info__sub">
-                  {{
-                    'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:'
-                  }}
-                </div>
-                <a
-                  class="button"
-                  :href="weddingEvent.streamingLink"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  role="button"
-                  >{{ 'Attend Online' }}</a
-                >
-              </div>
-            </template>
-          </div>
-          <div ref="mapElementRefs" class="item__graphic item__graphic--map" :data-index="index" />
-        </div>
+  <template v-if="!sortedViewableWeddingEvents.length">
+    <!-- show nothing -->
+  </template>
+  <template v-else>
+    <div class="events">
+      <div class="heading__wrapper">
+        <div class="heading">{{ sectionSettings?.title || 'EVENTS' }}</div>
       </div>
-    </template>
-    <template v-if="rsvp && hasRSVP">
-      <div class="content">
-        <div class="content__heading">RSVP</div>
-        <!-- TODO: Other RSVP Formats -->
-        <template v-if="rsvp.formType === RSVPFormTypes.markdown">
+      <div class="kv">
+        <div class="kv__main">{{ sectionSettings?.description.main }}</div>
+        <div class="kv__sub">{{ sectionSettings?.description.sub }}</div>
+      </div>
+      <template
+        v-for="(weddingEvent, index) in sortedViewableWeddingEvents"
+        :key="weddingEvent.eventName"
+      >
+        <div class="content" :data-order="index % 2 !== 0 ? 'reverse' : ''">
+          <div class="content__heading">{{ weddingEvent.eventName }}</div>
           <div class="content__item">
             <div class="item__text">
               <div class="item__info">
-                <AMarkdown class="info__markdown" :content="markdown" />
+                <div class="info__main">{{ weddingEvent.venue }}</div>
+                <div class="info__sub">
+                  {{ getDate(weddingEvent.timestamp, weddingEvent.timezone) }}
+                </div>
+              </div>
+              <template v-if="weddingEvent.streamingLink">
+                <div class="item__info">
+                  <div class="info__sub">
+                    {{
+                      'We would love to have your physical presence at this ceremony. However, if you are unable to attend physically, please attend online through below link:'
+                    }}
+                  </div>
+                  <a
+                    class="button"
+                    :href="weddingEvent.streamingLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    role="button"
+                    >{{ 'Attend Online' }}</a
+                  >
+                </div>
+              </template>
+            </div>
+            <div
+              ref="mapElementRefs"
+              class="item__graphic item__graphic--map"
+              :data-index="index"
+            />
+          </div>
+        </div>
+      </template>
+      <template v-if="rsvp && hasRSVP">
+        <div class="content">
+          <div class="content__heading">RSVP</div>
+          <!-- TODO: Other RSVP Formats -->
+          <template v-if="rsvp.formType === RSVPFormTypes.markdown">
+            <div class="content__item">
+              <div class="item__text">
+                <div class="item__info">
+                  <AMarkdown class="info__markdown" :content="markdown" />
+                </div>
               </div>
             </div>
-          </div>
-        </template>
-      </div>
-    </template>
-  </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </template>
 </template>
 <script lang="ts" setup>
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
+import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
 import type { RSVP, SectionSettings } from '~/types/model/wedding/weddingSettings'
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
+import type { Invitee } from '~/types/model/wedding/invitee'
 import { getTimezoneText } from '~/utils/time'
 import { RSVPFormTypes } from '~/types/model/wedding/weddingSettings'
 
@@ -70,18 +84,21 @@ defineOptions({
 })
 
 type Props = {
-  weddingEventsRecord: Record<string, WeddingEvent>
-  rsvp: RSVP | null
+  weddingEventsRecord?: Record<string, WeddingEvent>
+  rsvp?: RSVP | null
+  invitee?: Invitee | null
   sectionSettings: SectionSettings | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  weddingEvents: () => [],
+  weddingEventsRecord: undefined,
+  invitee: null,
   rsvp: null,
 })
 
-const weddingEventList = computed(() =>
-  [...Object.values(props.weddingEventsRecord)].sort((a, b) => a.order - b.order),
+const { sortedViewableWeddingEvents } = useWeddingEvents(
+  toRef(props, 'weddingEventsRecord'),
+  toRef(props, 'invitee'),
 )
 
 // SETTINGS
@@ -96,12 +113,14 @@ const getDate = (timestamp: number, timezone: string) => {
   return `${date} ${offset}`
 }
 
-const { mapElementRefs } = useMap(weddingEventList)
+const { mapElementRefs } = useMap(sortedViewableWeddingEvents)
 
 // RSVP
 
 const hasRSVP = computed(
-  () => !!props.rsvp?.isEnabled && weddingEventList.value.some(weddingEvent => !!weddingEvent.rsvp),
+  () =>
+    !!props.rsvp?.isEnabled &&
+    sortedViewableWeddingEvents.value.some(weddingEvent => !!weddingEvent.rsvp),
 )
 
 const markdown = ref()

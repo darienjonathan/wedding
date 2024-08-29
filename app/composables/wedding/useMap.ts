@@ -42,7 +42,10 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
           position,
           map,
         })
-        const infoWindow = new google.maps.InfoWindow({ content: infoWindowContent })
+        const infoWindow = new google.maps.InfoWindow({
+          content: infoWindowContent,
+          ariaLabel: weddingEvent.venue,
+        })
 
         const openInfoWindow = () => {
           infoWindow.open({

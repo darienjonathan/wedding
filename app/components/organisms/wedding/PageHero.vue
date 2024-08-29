@@ -27,8 +27,10 @@
         </template>
         <div class="kv__heading">{{ title }}</div>
         <div class="kv__line" />
-        <div class="kv__date">{{ kvDate }}</div>
-        <template v-if="isWeddingEventsSectionShown">
+        <template v-for="eventDate in eventDates" :key="eventDate">
+          <div class="kv__date">{{ eventDate }}</div>
+        </template>
+        <template v-if="!!sortedViewableWeddingEvents.length">
           <div class="kv__nav-btn">
             <div class="nav-btn__icon material-icons-outlined">expand_more</div>
             <div class="nav-btn__text" @click="emit('navClick')">{{ 'Events' }}</div>
@@ -36,39 +38,41 @@
         </template>
       </div>
       <div class="bottom__wrapper">
-        <div class="bottom__buttons">
-          <a
-            v-if="eventToShowStreaming"
-            class="bottom__button bottom__button--right"
-            :href="eventToShowStreaming.streamingLink"
-            :data-is-blur="isButtonBlur"
-            target="_blank"
-            rel="noopener noreferrer"
-            role="button"
-            >{{ 'Attend Online' }}</a
-          >
+        <div
+          v-if="streamingLinks.length > 0"
+          class="bottom__button"
+          :data-is-blur="isButtonBlur"
+          target="_blank"
+          rel="noopener noreferrer"
+          role="button"
+        >
+          {{ 'Attend Online' }}
         </div>
-        <div v-if="eventToShowStreaming" class="bottom__text">{{ streamingEventText }}</div>
+        <!-- <div v-if="eventToShowStreaming" class="bottom__text">{{ streamingEventText }}</div> -->
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
-import { getTimezoneText } from '~/utils/time'
+import type { Invitee } from '~/types/model/wedding/invitee'
+import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
+// import { getTimezoneText } from '~/utils/time'
 
 defineOptions({
   name: 'PageHero',
 })
 
 type Props = {
-  weddingEvents: Record<string, WeddingEvent> | null
-  weddingSettings: WeddingSettings | null
+  invitee?: Invitee | null
+  weddingEvents?: Record<string, WeddingEvent> | null
+  weddingSettings?: WeddingSettings | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  invitee: null,
+  weddingEvents: null,
   weddingSettings: null,
 })
 
@@ -110,56 +114,37 @@ onUnmounted(() => {
 // Events
 // --------------------------------------------------
 
-const { isWeddingEventsSectionShown } = useWeddingSettings(
-  toRef(props, 'weddingSettings'),
+const { sortedViewableWeddingEvents } = useWeddingEvents(
   toRef(props, 'weddingEvents'),
+  toRef(props, 'invitee'),
 )
+
+// --------------------------------------------------
+// Events: Dates
+// --------------------------------------------------
 
 const dayjs = useNuxtApp().$dayjs
 
-const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => boolean) => {
-  const events = Object.values(props.weddingEvents || {})
-  let nextEvents = events.filter(
-    weddingEvent =>
-      (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp)),
-  )
+const eventDates = computed(() => [
+  ...Array.from(
+    new Set(
+      sortedViewableWeddingEvents.value.map(weddingEvent => {
+        const { timestamp, timezone } = weddingEvent
+        const dayjsObject = dayjs(timestamp).tz(timezone)
 
-  if (!nextEvents.length) {
-    nextEvents = events.filter(weddingEvent => (filterFn ? filterFn(weddingEvent) : true))
-  }
+        return dayjsObject.format('dddd, D MMMM YYYY')
+      }),
+    ),
+  ),
+])
 
-  return nextEvents.sort((firstEvent, secondEvent) => {
-    const firstEventTimestamp = firstEvent.timestamp || 0
-    const secondEventTimestamp = secondEvent.timestamp || 0
+// --------------------------------------------------
+// Events: Streaming
+// --------------------------------------------------
 
-    return firstEventTimestamp - secondEventTimestamp
-  })[0]
-}
-
-const kvDate = computed(() => {
-  const earliestAvailableEvent = getEarliestAvailableEvent()
-  if (!earliestAvailableEvent) return
-
-  const { timestamp, timezone } = earliestAvailableEvent
-  const dayjsObject = dayjs(timestamp).tz(timezone)
-
-  return dayjsObject.format('dddd, D MMMM YYYY')
-})
-
-const eventToShowStreaming = computed(() =>
-  getEarliestAvailableEvent(weddingEvent => !!weddingEvent.streamingLink),
+const streamingLinks = computed(() =>
+  sortedViewableWeddingEvents.value.filter(event => event.streamingLink),
 )
-
-const streamingEventText = computed(() => {
-  if (!eventToShowStreaming.value) return
-
-  const { timestamp, timezone } = eventToShowStreaming.value
-  const dayjsObject = dayjs(timestamp).tz(timezone)
-  const time = dayjsObject.format('D MMMM YYYY, HH:mm')
-  const timezoneText = getTimezoneText(eventToShowStreaming.value.timezone, dayjsObject)
-
-  return `${eventToShowStreaming.value.eventName} Live Streaming starts at ${time} ${timezoneText}`
-})
 
 // --------------------------------------------------
 // Buttons
@@ -312,7 +297,7 @@ onUnmounted(() => {
   &__line {
     height: 1px;
     background: $white;
-    margin: 8px auto;
+    margin: 16px auto;
     @include pc {
       width: 400px;
     }
@@ -323,15 +308,15 @@ onUnmounted(() => {
   &__date {
     @include font-family('marcellus');
     @include font($size: $font-lg, $letter-spacing: 0.05rem);
-    line-height: 2;
+    line-height: 1.75;
     text-align: center;
-    margin-bottom: 16px;
   }
   &__nav-btn {
     @include flex;
     @include font-family('marcellus');
     @include bounce-animation;
     cursor: pointer;
+    margin-top: 16px;
     border-bottom: 1px solid transparent;
     transition: border-color 0.25s;
     &:hover {

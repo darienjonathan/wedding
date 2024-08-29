@@ -1,6 +1,5 @@
 <template>
   <AModal
-    class="story-modal"
     :is-open="props.isOpen"
     :width="isSP ? 'calc(100% - 50px)' : '75%'"
     @close="$emit('close')"

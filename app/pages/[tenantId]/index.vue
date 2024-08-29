@@ -19,7 +19,6 @@
             :section-settings="weddingSettings.sectionSettings.couple"
           />
           <WeddingEvents
-            v-if="isWeddingEventsSectionShown && weddingEvents"
             ref="eventsElementRef"
             class="events"
             :wedding-events-record="weddingEvents"
@@ -127,14 +126,13 @@ const weddingSettings = computed(() => response.value?.weddingSettings ?? null)
 const weddingEvents = computed(() => response.value?.weddingEvents ?? null)
 
 const {
-  isWeddingEventsSectionShown,
   isCoupleSectionShown,
   isStorySectionShown,
   isGallerySectionShown,
   isWishesSectionShown,
   isRegistrySectionShown,
   isClosingSectionShown,
-} = useWeddingSettings(weddingSettings, weddingEvents)
+} = useWeddingSettings(weddingSettings)
 
 // --------------------------------------------------
 // Client Side

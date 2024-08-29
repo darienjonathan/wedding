@@ -1,22 +1,13 @@
-import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 
-export const useWeddingSettings = (
-  weddingSettings: Ref<WeddingSettings | null>,
-  weddingEvents: Ref<Record<string, WeddingEvent> | null>,
-) => {
+export const useWeddingSettings = (weddingSettings: Ref<WeddingSettings | null>) => {
   const getIsSectionShown = (sectionKey: keyof WeddingSettings['sectionSettings']) => {
     const section = weddingSettings.value?.sectionSettings[sectionKey]
     if (!section?.isEnabled) return false
 
     // TODO: check for invitee existence
-    return !section.isExclusiveToInvitees
+    return 'isExclusiveToInvitees' in section ? !section.isExclusiveToInvitees : true
   }
-
-  const isWeddingEventsSectionShown = computed(() => {
-    if (!weddingEvents.value) return false
-    return getIsSectionShown('weddingEvents') && Object.values(weddingEvents.value).length
-  })
 
   const isCoupleSectionShown = computed(() => {
     if (!getIsSectionShown('couple')) return false
@@ -40,7 +31,6 @@ export const useWeddingSettings = (
   const isClosingSectionShown = computed(() => getIsSectionShown('closing'))
 
   return {
-    isWeddingEventsSectionShown,
     isCoupleSectionShown,
     isStorySectionShown,
     isGallerySectionShown,
