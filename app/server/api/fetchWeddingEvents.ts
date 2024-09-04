@@ -1,9 +1,9 @@
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import { createEndpoint, parseSearchParams } from '~/utils/api'
 
-export type FetchWeddingEventsResponse = Record<string, WeddingEvent>
+export type FetchWeddingEventsResponse = WeddingEvent[]
 
-export default defineEventHandler(async event => {
+export default defineEventHandler<Promise<FetchWeddingEventsResponse>>(async event => {
   const config = useRuntimeConfig()
   const url = createEndpoint(config.functionsBaseURL, 'fetchWeddingEvents')
 
@@ -24,5 +24,5 @@ export default defineEventHandler(async event => {
     })
   }
 
-  return data
+  return Object.values(data)
 })

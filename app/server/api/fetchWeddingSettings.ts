@@ -3,7 +3,7 @@ import { createEndpoint, parseSearchParams } from '~/utils/api'
 
 export type FetchWeddigSettingsResponse = WeddingSettings
 
-export default defineEventHandler(async event => {
+export default defineEventHandler<Promise<FetchWeddigSettingsResponse>>(async event => {
   const config = useRuntimeConfig()
   const url = createEndpoint(config.functionsBaseURL, 'fetchWeddingSettings')
 

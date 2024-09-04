@@ -17,12 +17,14 @@ const parseInviteeEvent = (data: any = {}): InviteeEvent => ({
 })
 
 export type Invitee = {
+  id: string
   name: string
   contact: string
   events: InviteeEvent[]
 }
 
 export const parseInvitee = (data: any = {}): Invitee => ({
+  id: parseString(data.id),
   name: parseString(data.name),
   contact: parseString(data.contact),
   events: parseArray(data.events, parseInviteeEvent),
@@ -38,9 +40,11 @@ const parseInviteeRSVPEvent = (data: any = {}): InviteeRSVPEvent => ({
 })
 
 export type InviteeRSVP = {
+  id: string
   events: InviteeRSVPEvent[]
 }
 
 export const parseInviteeRSVP = (data: any = {}): InviteeRSVP => ({
+  id: parseString(data.id),
   events: parseArray(data.events, parseInviteeRSVPEvent),
 })

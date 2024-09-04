@@ -38,17 +38,28 @@
         </template>
       </div>
       <div class="bottom__wrapper">
-        <div
-          v-if="streamingLinks.length > 0"
-          class="bottom__button"
-          :data-is-blur="isButtonBlur"
-          target="_blank"
-          rel="noopener noreferrer"
-          role="button"
-        >
-          {{ 'Attend Online' }}
+        <div class="bottom__buttons">
+          <div
+            v-if="streamingLinks.length > 0"
+            class="bottom__button"
+            :data-is-blur="isButtonBlur"
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+          >
+            {{ 'Attend Online' }}
+          </div>
+          <div
+            v-if="hasRSVP"
+            class="bottom__button"
+            :data-is-blur="isButtonBlur"
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+          >
+            {{ 'RSVP' }}
+          </div>
         </div>
-        <!-- <div v-if="eventToShowStreaming" class="bottom__text">{{ streamingEventText }}</div> -->
       </div>
     </div>
   </div>
@@ -58,23 +69,19 @@ import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import type { Invitee } from '~/types/model/wedding/invitee'
 import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
-// import { getTimezoneText } from '~/utils/time'
+import { useWeddingRSVP } from '~/composables/wedding/useWeddingRSVP'
 
 defineOptions({
   name: 'PageHero',
 })
 
 type Props = {
-  invitee?: Invitee | null
-  weddingEvents?: Record<string, WeddingEvent> | null
-  weddingSettings?: WeddingSettings | null
+  invitee: Invitee | null
+  weddingEvents: WeddingEvent[]
+  weddingSettings: WeddingSettings | null
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  invitee: null,
-  weddingEvents: null,
-  weddingSettings: null,
-})
+const props = defineProps<Props>()
 
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
 
@@ -145,6 +152,17 @@ const eventDates = computed(() => [
 const streamingLinks = computed(() =>
   sortedViewableWeddingEvents.value.filter(event => event.streamingLink),
 )
+
+// --------------------------------------------------
+// Events: RSVP
+// --------------------------------------------------
+
+const { hasRSVP } = useWeddingRSVP({
+  // todo: refactor
+  rsvp: props.weddingSettings ? toRef(props.weddingSettings, 'rsvp') : ref(null),
+  weddingEvents: toRef(props, 'weddingEvents'),
+  invitee: toRef(props, 'invitee'),
+})
 
 // --------------------------------------------------
 // Buttons
@@ -384,17 +402,16 @@ onUnmounted(() => {
     transform: translateX(-50%);
     gap: 16px;
     z-index: 1;
-    @include pc {
-      bottom: 75px;
-    }
-    @include sp {
-      bottom: 25px;
-    }
+    bottom: 50px;
   }
 
   &__buttons {
     @include flex;
     margin-bottom: 16px;
+
+    & > * + * {
+      margin-left: 16px;
+    }
   }
 
   &__button {
@@ -402,22 +419,9 @@ onUnmounted(() => {
     text-decoration: none;
     color: inherit;
     white-space: pre;
-
-    &--left {
-      grid-area: btn-left;
-    }
-
-    &--right {
-      grid-area: btn-right;
-    }
-
-    &:not(:last-child) {
-      margin-right: 16px;
-    }
   }
 
   &__text {
-    grid-area: text;
     text-align: center;
     @include font-family('marcellus');
     @include pc {

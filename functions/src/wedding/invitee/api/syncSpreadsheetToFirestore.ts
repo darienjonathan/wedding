@@ -132,8 +132,8 @@ const makeInvitees = async ({
       inviteeRSVPEvents.push(inviteeRSVPEvent)
     })
 
-    const invitee: Invitee = { name, contact: row[2], events: inviteeEvents }
-    const inviteeRSVP: InviteeRSVP = { events: inviteeRSVPEvents }
+    const invitee: Invitee = { id: inviteeUid, name, contact: row[2], events: inviteeEvents }
+    const inviteeRSVP: InviteeRSVP = { id: inviteeUid, events: inviteeRSVPEvents }
     inviteeMap.set(inviteeUid, parseInvitee(invitee))
     inviteeRSVPMap.set(inviteeUid, parseInviteeRSVP(inviteeRSVP))
   })

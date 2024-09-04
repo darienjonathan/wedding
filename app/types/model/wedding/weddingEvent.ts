@@ -23,8 +23,14 @@ export const parseInvitationType = (data: any = {}): RSVPType => {
   }
 }
 
+export type WeddingEventRSVP = {
+  type: RSVPType
+  deadlineTimestamp: number
+}
+
 // Setting the type name to "Event" will make it conflict with the DOM Event
 export type WeddingEvent = {
+  id: string
   isExclusiveToInvitees: boolean
   eventName: string
   venue: string
@@ -36,13 +42,11 @@ export type WeddingEvent = {
   timezone: string
   streamingLink: string
   /* invitation type and deadline. undefined means RSVP is not required. */
-  rsvp?: {
-    type: RSVPType
-    deadlineTimestamp: number
-  }
+  rsvp?: WeddingEventRSVP
 }
 
 export const parseWeddingEvent = (data: any = {}): WeddingEvent => ({
+  id: parseString(data.id),
   isExclusiveToInvitees: parseBoolean(data.isExclusiveToInvitees),
   eventName: parseString(data.eventName),
   venue: parseString(data.venue),

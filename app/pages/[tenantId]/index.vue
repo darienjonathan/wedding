@@ -7,6 +7,7 @@
           class="hero"
           :wedding-settings="weddingSettings"
           :wedding-events="weddingEvents"
+          :invitee="invitee"
           @nav-click="handleNavClick"
           @loading-done="handleLoadingDone"
         >
@@ -21,7 +22,8 @@
           <WeddingEvents
             ref="eventsElementRef"
             class="events"
-            :wedding-events-record="weddingEvents"
+            :wedding-events="weddingEvents"
+            :invitee="invitee"
             :rsvp="weddingSettings.rsvp"
             :section-settings="weddingSettings.sectionSettings.weddingEvents"
           />
@@ -88,6 +90,8 @@ const tenantId = Array.isArray(route.params.tenantId)
   ? route.params.tenantId[0]
   : route.params.tenantId
 
+const inviteeUid = route.query.inviteeUid as string | undefined
+
 // --------------------------------------------------
 // Server Side
 // --------------------------------------------------
@@ -123,7 +127,7 @@ watch(
 )
 
 const weddingSettings = computed(() => response.value?.weddingSettings ?? null)
-const weddingEvents = computed(() => response.value?.weddingEvents ?? null)
+const weddingEvents = computed(() => response.value?.weddingEvents ?? [])
 
 const {
   isCoupleSectionShown,
@@ -133,6 +137,14 @@ const {
   isRegistrySectionShown,
   isClosingSectionShown,
 } = useWeddingSettings(weddingSettings)
+
+// --------------------------------------------------
+// Client Side - Firebase
+// --------------------------------------------------
+
+const { useInvitees } = useFirestoreCollections()
+const inviteesFirestore = useInvitees(tenantId)
+const invitee = inviteeUid ? await inviteesFirestore.loadDocument(inviteeUid) : null
 
 // --------------------------------------------------
 // Client Side

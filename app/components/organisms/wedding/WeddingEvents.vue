@@ -73,7 +73,7 @@
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
 import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
-import type { RSVP, SectionSettings } from '~/types/model/wedding/weddingSettings'
+import type { RSVP, EventsSectionSettings } from '~/types/model/wedding/weddingSettings'
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import type { Invitee } from '~/types/model/wedding/invitee'
 import { getTimezoneText } from '~/utils/time'
@@ -84,20 +84,16 @@ defineOptions({
 })
 
 type Props = {
-  weddingEventsRecord?: Record<string, WeddingEvent>
-  rsvp?: RSVP | null
-  invitee?: Invitee | null
-  sectionSettings: SectionSettings | null
+  weddingEvents: WeddingEvent[]
+  rsvp: RSVP | null
+  invitee: Invitee | null
+  sectionSettings: EventsSectionSettings | null
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  weddingEventsRecord: undefined,
-  invitee: null,
-  rsvp: null,
-})
+const props = defineProps<Props>()
 
 const { sortedViewableWeddingEvents } = useWeddingEvents(
-  toRef(props, 'weddingEventsRecord'),
+  toRef(props, 'weddingEvents'),
   toRef(props, 'invitee'),
 )
 
