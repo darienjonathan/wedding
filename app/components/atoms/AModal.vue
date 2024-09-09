@@ -29,8 +29,8 @@ type Props = {
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'default',
-  width: '',
-  height: '',
+  width: undefined,
+  height: undefined,
   isOpen: false,
 })
 
@@ -123,7 +123,7 @@ onUnmounted(() => {
     }
   }
   &[data-type='auto'] {
-    @include size('auto', 'auto');
+    @include size(auto, auto);
   }
   &[data-type='full-size'] {
     @include size(100%, 100%);
