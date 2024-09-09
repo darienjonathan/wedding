@@ -1,6 +1,12 @@
 import { google, sheets_v4 } from 'googleapis'
 import { serviceAccount } from '~/credentials/serviceAccount'
 
+type Cell = [number, number]
+
+const cellToR1C1 = ([row, col]: Cell) => `R${row}C${col}`
+export const getR1C1Notation = (startCell: Cell, endCell?: Cell) =>
+  `${process.env.SHEET_NAME}!${cellToR1C1(startCell)}${endCell ? `:${cellToR1C1(endCell)}` : ''}`
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const parseCellValue = (val: any) => {
   if (val === 'FALSE') return false
@@ -27,10 +33,11 @@ export const getSheets = (): Promise<sheets_v4.Sheets> => {
 
 export const batchUpdate = async (
   sheets: sheets_v4.Sheets,
+  spreadsheetId: string,
   data: sheets_v4.Schema$ValueRange[],
 ) => {
   const request: sheets_v4.Params$Resource$Spreadsheets$Values$Batchupdate = {
-    spreadsheetId: process.env.SPREADSHEET_ID,
+    spreadsheetId,
     requestBody: {
       data,
       valueInputOption: 'RAW',
@@ -44,12 +51,11 @@ export const batchUpdate = async (
 
 export const getSheetRows = async (
   sheets: sheets_v4.Sheets,
-  range?: string,
+  spreadsheetId: string,
+  range: string,
 ): Promise<sheets_v4.Schema$ValueRange['values']> => {
-  if (!range) return
-
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.SPREADSHEET_ID,
+    spreadsheetId,
     range,
   })
 

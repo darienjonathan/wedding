@@ -1,28 +1,28 @@
-<template lang="pug">
-.a-modal(v-show="isOpen")
-  transition(
-    name="fade"
-    @after-leave="$emit('close')"
-    appear
-  )
-    .overlay(
-      @click="handleClose"
-      v-show="isModalOpen"
-    )
-      .wrapper(
-        :style="{ width, height }"
-        :data-type="type"
-        @click.stop
-      )
-        slot
-        .close__btn(@click="handleClose")
-          .close__icon.material-icons-outlined close
+<template>
+  <teleport to="body">
+    <div v-show="isOpen" class="a-modal">
+      <transition name="fade" appear @after-leave="$emit('close')">
+        <div v-show="isModalOpen" class="overlay" @click="handleClose">
+          <div class="wrapper" :style="{ width, height }" :data-type="type" @click.stop>
+            <slot />
+            <div class="close__btn" @click="handleClose">
+              <div class="close__icon material-icons-outlined">close</div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </teleport>
 </template>
 <script lang="ts" setup>
 import { useModalStore } from '~/store'
 
+/**
+ * Props
+ */
+
 type Props = {
-  type: 'default' | 'full-size' | 'auto' | 'frameless'
+  type?: 'default' | 'full-size' | 'auto' | 'frameless'
   width?: string
   height?: string
   isOpen: boolean
@@ -34,8 +34,17 @@ const props = withDefaults(defineProps<Props>(), {
   isOpen: false,
 })
 
-const modalStore = useModalStore()
+/**
+ * Emit
+ */
 
+defineEmits(['close'])
+
+/**
+ * Modal Open/Close Logic
+ */
+
+const modalStore = useModalStore()
 const { isOpen } = toRefs(props)
 const isModalOpen = ref(false)
 

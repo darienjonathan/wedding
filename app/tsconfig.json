@@ -7,7 +7,4 @@
     "jsx": "preserve",
   },
   "compileOnSave": true,
- 	"vueCompilerOptions": {
- 		"plugins": ["@vue/language-plugin-pug"]
- 	}
 }

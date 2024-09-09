@@ -1,7 +1,9 @@
-<template lang="pug">
-Base
-  .wrapper
-    slot
+<template>
+  <Base>
+    <div class="wrapper">
+      <slot />
+    </div>
+  </Base>
 </template>
 
 <script lang="ts" setup>

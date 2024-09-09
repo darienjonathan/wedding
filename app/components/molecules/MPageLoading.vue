@@ -1,11 +1,10 @@
-<template lang="pug">
-.slot(:data-show="showSlot")
-  slot
-.loading-wrapper(
-  ref="loadingWrapperRef"
-  :data-show="showLoading"
-)
-  ALoading.loading-ui
+<template>
+  <div class="slot" :data-show="showSlot">
+    <slot />
+  </div>
+  <div ref="loadingWrapperRef" class="loading-wrapper" :data-show="showLoading">
+    <ALoading class="loading-ui" />
+  </div>
 </template>
 <script lang="ts" setup>
 import ALoading from '~/components/atoms/ALoading.vue'

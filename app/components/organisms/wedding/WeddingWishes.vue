@@ -1,33 +1,43 @@
-<template lang="pug">
-.wishes
-  .heading__wrapper
-    .heading {{ sectionSettings.title || 'GREETINGS & WISHES' }}
-  .content
-    .content__form.form
-      input.form__name(
-        type="text"
-        placeholder="Name"
-        :value="currentWish.name"
-        @input="handleInputName"
-      )
-      textarea.form__textarea(
-        placeholder="Your greetings & wishes for the couple"
-        :value="currentWish.content"
-        @input="handleInputContent"
-      )
-      button.form__submit(
-        :disabled="!canSubmit"
-        @click="handleSubmit"
-      ) {{ submitButtonText }}
-    .content__item.item(:data-empty="!sortedWishes.length")
-      template(v-if="sortedWishes.length")
-        template(v-for="{ name, timestamp, content } in sortedWishes")
-          .item__wrapper
-            .item__name {{ name }}
-            .item__date {{ wishTimestampToString(timestamp) }}
-            .item__content {{ content }}
-      template(v-else)
-        .item__empty-text {{ 'Be the first to greet the couple!' }}
+<template>
+  <div class="wishes">
+    <div class="heading__wrapper">
+      <div class="heading">{{ sectionSettings.title || 'GREETINGS & WISHES' }}</div>
+    </div>
+    <div class="content">
+      <div class="content__form form">
+        <input
+          class="form__name"
+          type="text"
+          placeholder="Name"
+          :value="currentWish.name"
+          @input="handleInputName"
+        />
+        <textarea
+          class="form__textarea"
+          placeholder="Your greetings & wishes for the couple"
+          :value="currentWish.content"
+          @input="handleInputContent"
+        />
+        <button class="form__submit" :disabled="!canSubmit" @click="handleSubmit">
+          {{ submitButtonText }}
+        </button>
+      </div>
+      <div class="content__item item" :data-empty="!sortedWishes.length">
+        <template v-if="sortedWishes.length">
+          <template v-for="{ name, timestamp, content } in sortedWishes" :key="timestamp">
+            <div class="item__wrapper">
+              <div class="item__name">{{ name }}</div>
+              <div class="item__date">{{ wishTimestampToString(timestamp) }}</div>
+              <div class="item__content">{{ content }}</div>
+            </div>
+          </template>
+        </template>
+        <template v-else>
+          <div class="item__empty-text">{{ 'Be the first to greet the couple!' }}</div>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs'
@@ -39,8 +49,7 @@ import type { Wish } from '~/types/model/wedding/wish'
 const WISH_UID_LOCALSTORAGE_KEY = 'wish_uid'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Wishes',
+  name: 'WeddingWishes',
 })
 
 type Props = {

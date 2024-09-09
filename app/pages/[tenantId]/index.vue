@@ -1,65 +1,85 @@
-<template lang="pug">
-.wedding
-  MPageLoading(:is-loading="isLoading")
-    .buttons-intersection-observer(ref="observerElementRef")
-    .wrapper
-      Hero.hero(
-        :weddingSettings="weddingSettings"
-        @nav-click="handleNavClick"
-        @loading-done="handleLoadingDone"
-      )
-      .content(v-if="weddingSettings")
-        AboutUs.about-us(
-          v-if="isCoupleSectionShown"
-          :couple="weddingSettings.couple"
-          :sectionSettings="weddingSettings.sectionSettings.couple"
-        )
-        Events.events(
-          v-if="isWeddingEventsSectionShown"
-          :weddingEvents="weddingSettings.weddingEvents"
-          :rsvp="weddingSettings.rsvp"
-          :sectionSettings="weddingSettings.sectionSettings.weddingEvents"
-          ref="eventsElementRef"
-        )
-        OurStory.our-story(
-          v-if="isStorySectionShown"
-          :stories="weddingSettings.stories"
-          :sectionSettings="weddingSettings.sectionSettings.story"
-        )
-        Gallery.gallery(
-          v-if="isGallerySectionShown"
-          :sectionSettings="weddingSettings.sectionSettings.gallery"
-          :gallery="weddingSettings.gallery"
-        )
-        .wishes__wrapper(v-if="isWishesSectionShown")
-          Wishes.wishes(
-            :sectionSettings="weddingSettings.sectionSettings.wishes"
-            :tenantId="tenantId"
-          )
-        Registry.registry(
-          v-if="isRegistrySectionShown"
-          :registries="weddingSettings.registries"
-          :sectionSettings="weddingSettings.sectionSettings.registry"
-        )
-        template(v-if="isClosingSectionShown")
-          .line
-          Closing.closing(:sectionSettings="weddingSettings.sectionSettings.closing")
-        Footer.footer(:type="weddingSettings.footer.type")
+<template>
+  <div class="wedding">
+    <MPageLoading :is-loading="isLoading">
+      <div ref="observerElementRef" class="buttons-intersection-observer" />
+      <div class="wrapper">
+        <PageHero
+          class="hero"
+          :wedding-settings="weddingSettings"
+          :wedding-events="weddingEvents"
+          :invitee="invitee"
+          @nav-click="handleNavClick"
+          @loading-done="handleLoadingDone"
+        >
+        </PageHero>
+        <div v-if="weddingSettings" class="content">
+          <AboutUs
+            v-if="isCoupleSectionShown"
+            class="about-us"
+            :couple="weddingSettings.couple"
+            :section-settings="weddingSettings.sectionSettings.couple"
+          />
+          <WeddingEvents
+            ref="eventsElementRef"
+            class="events"
+            :wedding-events="weddingEvents"
+            :invitee="invitee"
+            :rsvp="weddingSettings.rsvp"
+            :section-settings="weddingSettings.sectionSettings.weddingEvents"
+          />
+          <OurStory
+            v-if="isStorySectionShown"
+            class="our-story"
+            :stories="weddingSettings.stories"
+            :section-settings="weddingSettings.sectionSettings.story"
+          />
+          <ImageGallery
+            v-if="isGallerySectionShown"
+            class="gallery"
+            :section-settings="weddingSettings.sectionSettings.gallery"
+            :gallery="weddingSettings.gallery"
+          />
+          <div v-if="isWishesSectionShown" class="wishes__wrapper">
+            <WeddingWishes
+              class="wishes"
+              :section-settings="weddingSettings.sectionSettings.wishes"
+              :tenant-id="tenantId"
+            />
+          </div>
+          <WeddingRegistry
+            v-if="isRegistrySectionShown"
+            class="registry"
+            :registries="weddingSettings.registries"
+            :section-settings="weddingSettings.sectionSettings.registry"
+          />
+          <template v-if="isClosingSectionShown">
+            <div class="line" />
+            <ClosingSection
+              class="closing"
+              :section-settings="weddingSettings.sectionSettings.closing"
+            />
+          </template>
+          <PageFooter class="footer" :type="weddingSettings.footer.type" />
+        </div>
+      </div>
+    </MPageLoading>
+  </div>
 </template>
 <script lang="ts" setup>
-import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
-import type EventsType from '~/components/organisms/wedding/Events.vue'
-import Events from '~/components/organisms/wedding/Events.vue'
+import type EventsType from '~/components/organisms/wedding/WeddingEvents.vue'
+import WeddingEvents from '~/components/organisms/wedding/WeddingEvents.vue'
 import AboutUs from '~/components/organisms/wedding/AboutUs.vue'
-import Hero from '~/components/organisms/wedding/Hero.vue'
-import Registry from '~/components/organisms/wedding/Registry.vue'
+import PageHero from '~/components/organisms/wedding/PageHero.vue'
+import WeddingRegistry from '~/components/organisms/wedding/WeddingRegistry.vue'
 import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
 import MPageLoading from '~~/components/molecules/MPageLoading.vue'
-import Closing from '~~/components/organisms/wedding/Closing.vue'
-import Footer from '~~/components/organisms/wedding/Footer.vue'
-import Gallery from '~~/components/organisms/wedding/Gallery.vue'
+import ClosingSection from '~~/components/organisms/wedding/ClosingSection.vue'
+import PageFooter from '~~/components/organisms/wedding/PageFooter.vue'
+import ImageGallery from '~~/components/organisms/wedding/ImageGallery.vue'
 import OurStory from '~~/components/organisms/wedding/OurStory.vue'
-import Wishes from '~~/components/organisms/wedding/Wishes.vue'
+import WeddingWishes from '~~/components/organisms/wedding/WeddingWishes.vue'
+import type { FetchWeddingEventsResponse } from '~/server/api/fetchWeddingEvents'
+import type { FetchWeddigSettingsResponse } from '~/server/api/fetchWeddingSettings'
 
 defineOptions({
   name: 'WeddingPage',
@@ -70,19 +90,31 @@ const tenantId = Array.isArray(route.params.tenantId)
   ? route.params.tenantId[0]
   : route.params.tenantId
 
+const inviteeUid = route.query.inviteeUid as string | undefined
+
 // --------------------------------------------------
-// Wedding Settings
+// Server Side
 // --------------------------------------------------
 
-const { data: weddingSettings, status: weddingSettingsFetchStatus } =
-  await useFetch<WeddingSettings>('/api/fetchWeddingSettings', {
-    query: { tenantId },
-  })
+const { data: response, status } = await useAsyncData<{
+  weddingSettings: FetchWeddigSettingsResponse
+  weddingEvents: FetchWeddingEventsResponse
+}>('data', async () => {
+  const [weddingSettingsResponse, weddingEventsResponse] = await Promise.all([
+    $fetch(`/api/fetchWeddingSettings?tenantId=${tenantId}`),
+    $fetch(`/api/fetchWeddingEvents?tenantId=${tenantId}`),
+  ])
+
+  return {
+    weddingSettings: weddingSettingsResponse,
+    weddingEvents: weddingEventsResponse,
+  }
+})
 
 watch(
-  [weddingSettingsFetchStatus],
+  [status],
   () => {
-    if (weddingSettingsFetchStatus.value === 'error') {
+    if (status.value === 'error') {
       throw createError({
         fatal: true,
         statusCode: 404,
@@ -94,8 +126,10 @@ watch(
   },
 )
 
+const weddingSettings = computed(() => response.value?.weddingSettings ?? null)
+const weddingEvents = computed(() => response.value?.weddingEvents ?? [])
+
 const {
-  isWeddingEventsSectionShown,
   isCoupleSectionShown,
   isStorySectionShown,
   isGallerySectionShown,
@@ -103,6 +137,14 @@ const {
   isRegistrySectionShown,
   isClosingSectionShown,
 } = useWeddingSettings(weddingSettings)
+
+// --------------------------------------------------
+// Client Side - Firebase
+// --------------------------------------------------
+
+const { useInvitees } = useFirestoreCollections()
+const inviteesFirestore = useInvitees(tenantId)
+const invitee = inviteeUid ? await inviteesFirestore.loadDocument(inviteeUid) : null
 
 // --------------------------------------------------
 // Client Side

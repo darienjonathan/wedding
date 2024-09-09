@@ -1,24 +1,31 @@
-<template lang="pug">
-.registry
-  .heading__wrapper
-    .heading {{ sectionSettings.title || 'REGISTRY' }}
-  .kv
-    .kv__main {{ sectionSettings.description.main }}
-    .kv__sub {{ sectionSettings.description.sub }}
-  .account__wrapper
-    .account
-      template(v-for="registry in registries")
-        .account__item.item
-          template(v-for="[label, value] in Object.entries(registry)")
-            .item__label {{ label }}
-            .item__value {{ value }}
+<template>
+  <div class="registry">
+    <div class="heading__wrapper">
+      <div class="heading">{{ sectionSettings.title || 'REGISTRY' }}</div>
+    </div>
+    <div class="kv">
+      <div class="kv__main">{{ sectionSettings.description.main }}</div>
+      <div class="kv__sub">{{ sectionSettings.description.sub }}</div>
+    </div>
+    <div class="account__wrapper">
+      <div class="account">
+        <template v-for="(registry, index) in registries" :key="index">
+          <div class="account__item item">
+            <template v-for="[label, value] in Object.entries(registry)" :key="label">
+              <div class="item__label">{{ label }}</div>
+              <div class="item__value">{{ value }}</div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import type { Registry, SectionSettings } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Registry',
+  name: 'WeddingRegistry',
 })
 
 type Props = {

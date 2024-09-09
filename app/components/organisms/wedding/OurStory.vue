@@ -1,32 +1,55 @@
-<template lang="pug">
-.our-story
-  .heading__wrapper
-    .heading {{ sectionSettings.title || 'OUR STORY' }}
-  .kv
-    .kv__main(v-if="sectionSettings.description.main") {{ sectionSettings.description.main }}
-    .kv__sub(v-if="sectionSettings.description.sub") {{ sectionSettings.description.sub }}
-  .story
-    template(v-for="(story, index) in stories")
-      .story__item(
-        @click="handleStoryClick(index)"
-        :style="{ cursor: isStorySelectable(story) ? 'pointer' : 'auto' }"
-      )
-        NuxtImg.story__thumbnail(
-          :v-if="story.picture"
-          :src="story.picture"
-          loading="lazy"
-        )
-        .story__content.content
-          .content__title {{ `${index + 1}. ${story.title}` }}
-          .content__text {{ story.summary }}
-          template(v-if="isStorySelectable(story)")
-            .content__read-more {{ 'Read More' }}
-  template(v-if="selectedStoryIndex !== undefined")
-    StoryModal(
-      :is-open="isStoryModalOpen"
-      :story="stories[selectedStoryIndex]"
-      @close="handleCloseStoryModal"
-    )
+<template>
+  <div class="our-story">
+    <div class="heading__wrapper">
+      <div class="heading">
+        {{ sectionSettings.title || 'OUR STORY' }}
+      </div>
+    </div>
+    <div class="kv">
+      <div v-if="sectionSettings.description.main" class="kv__main">
+        {{ sectionSettings.description.main }}
+      </div>
+      <div v-if="sectionSettings.description.sub" class="kv__sub">
+        {{ sectionSettings.description.sub }}
+      </div>
+    </div>
+    <div class="story">
+      <template v-for="(story, index) in stories" :key="story.title">
+        <div
+          class="story__item"
+          :style="{ cursor: isStorySelectable(story) ? 'pointer' : 'auto' }"
+          @click="handleStoryClick(index)"
+        >
+          <NuxtImg
+            v-if="story.picture"
+            class="story__thumbnail"
+            :src="story.picture"
+            loading="lazy"
+          />
+          <div class="story__content content">
+            <div class="content__title">
+              {{ `${index + 1}. ${story.title}` }}
+            </div>
+            <div class="content__text">
+              {{ story.summary }}
+            </div>
+            <template v-if="isStorySelectable(story)">
+              <div class="content__read-more">
+                {{ 'Read More' }}
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+    <template v-if="selectedStoryIndex !== undefined">
+      <StoryModal
+        :is-open="isStoryModalOpen"
+        :story="stories[selectedStoryIndex]"
+        @close="handleCloseStoryModal"
+      />
+    </template>
+  </div>
 </template>
 <script lang="ts" setup>
 import StoryModal from '~/components/organisms/wedding/StoryModal.vue'

@@ -1,19 +1,21 @@
-<template lang="pug">
-.a-select
-  .label {{ label }}
-  .items
-    template(
-      v-for="(item, index) in items"
-      :key="index"
-    )
-      .item
-        input.item__radio(
-          type="radio"
-          :value="index"
-          :disabled="isDisabled"
-          v-model="selectedItemIndex"
-        )
-        .item__label {{ item }}
+<template>
+  <div class="a-select">
+    <div class="label">{{ label }}</div>
+    <div class="items">
+      <template v-for="(item, index) in items" :key="index">
+        <div class="item">
+          <input
+            v-model="selectedItemIndex"
+            class="item__radio"
+            type="radio"
+            :value="index"
+            :disabled="isDisabled"
+          />
+          <div class="item__label">{{ item }}</div>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import type { ASelect } from '~/types/components'

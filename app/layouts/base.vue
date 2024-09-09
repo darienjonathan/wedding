@@ -1,6 +1,7 @@
-<template lang="pug">
-.base
-  slot
+<template>
+  <div class="base">
+    <slot />
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -1,5 +1,5 @@
-import type { WeddingEvent } from '~/types/model/wedding/weddingSettings'
 import useGoogleMaps from '~/composables/useMap'
+import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 
 export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
   const { loader } = useGoogleMaps()
@@ -42,7 +42,10 @@ export const useMap = (weddingEvents: Ref<WeddingEvent[]>) => {
           position,
           map,
         })
-        const infoWindow = new google.maps.InfoWindow({ content: infoWindowContent })
+        const infoWindow = new google.maps.InfoWindow({
+          content: infoWindowContent,
+          ariaLabel: weddingEvent.venue,
+        })
 
         const openInfoWindow = () => {
           infoWindow.open({

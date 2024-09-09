@@ -1,59 +1,87 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<template lang="pug">
-.hero
-  .hero__filler
-    .hero__button-intersection-observer(ref="buttonObserverElementRef")
-    .hero__intersection-observer(ref="observerElementRef")
-  .hero__content(:data-is-blur="isBlur")
-    NuxtImg.hero__image(
-      v-if="weddingSettings?.hero.imageSrc"
-      :src="weddingSettings?.hero.imageSrc"
-      @load="$emit('loadingDone')"
-    )
-    .hero__invitation-text.invitation-text
-      .invitation-text__item {{ weddingSettings?.hero.invitationText }}
-    .hero__kv.kv
-      template(v-if="weddingSettings?.hero.tagline.jp")
-        .kv__subheading.kv__subheading--jp {{ weddingSettings?.hero.tagline.jp }}
-      template(v-if="weddingSettings?.hero.tagline.en")
-        .kv__subheading.kv__subheading--en {{ weddingSettings?.hero.tagline.en }}
-      .kv__heading {{ title }}
-      .kv__line
-      .kv__date {{ kvDate }}
-      template(v-if="isWeddingEventsSectionShown")
-        .kv__nav-btn
-          .nav-btn__icon.material-icons-outlined expand_more
-          .nav-btn__text(@click="emit('navClick')") {{ 'Events' }}
-
-    .bottom__wrapper
-      .bottom__buttons
-        a.bottom__button.bottom__button--right(
-          v-if="eventToShowStreaming"
-          :href="eventToShowStreaming.streamingLink"
-          :data-is-blur="isButtonBlur"
-          target="_blank"
-          rel="noopener noreferrer"
-          role="button"
-        ) {{ 'Attend Online' }}
-      .bottom__text(v-if="eventToShowStreaming") {{ streamingEventText }}
+<template>
+  <div class="hero">
+    <div class="hero__filler">
+      <div ref="buttonObserverElementRef" class="hero__button-intersection-observer" />
+      <div ref="observerElementRef" class="hero__intersection-observer" />
+    </div>
+    <div class="hero__content" :data-is-blur="isBlur">
+      <NuxtImg
+        v-if="weddingSettings?.hero.imageSrc"
+        class="hero__image"
+        :src="weddingSettings?.hero.imageSrc"
+        @load="$emit('loadingDone')"
+      />
+      <div class="hero__invitation-text invitation-text">
+        <div class="invitation-text__item">{{ weddingSettings?.hero.invitationText }}</div>
+      </div>
+      <div class="hero__kv kv">
+        <template v-if="weddingSettings?.hero.tagline.jp">
+          <div class="kv__subheading kv__subheading--jp">
+            {{ weddingSettings?.hero.tagline.jp }}
+          </div>
+        </template>
+        <template v-if="weddingSettings?.hero.tagline.en">
+          <div class="kv__subheading kv__subheading--en">
+            {{ weddingSettings?.hero.tagline.en }}
+          </div>
+        </template>
+        <div class="kv__heading">{{ title }}</div>
+        <div class="kv__line" />
+        <template v-for="eventDate in eventDates" :key="eventDate">
+          <div class="kv__date">{{ eventDate }}</div>
+        </template>
+        <template v-if="!!sortedViewableWeddingEvents.length">
+          <div class="kv__nav-btn">
+            <div class="nav-btn__icon material-icons-outlined">expand_more</div>
+            <div class="nav-btn__text" @click="emit('navClick')">{{ 'Events' }}</div>
+          </div>
+        </template>
+      </div>
+      <div class="bottom__wrapper">
+        <div class="bottom__buttons">
+          <div
+            v-if="streamingLinks.length > 0"
+            class="bottom__button"
+            :data-is-blur="isButtonBlur"
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+          >
+            {{ 'Attend Online' }}
+          </div>
+          <div
+            v-if="hasRSVP"
+            class="bottom__button"
+            :data-is-blur="isButtonBlur"
+            target="_blank"
+            rel="noopener noreferrer"
+            role="button"
+          >
+            {{ 'RSVP' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
-import { useWeddingSettings } from '~/composables/wedding/useWeddingSettings'
-import type { WeddingEvent, WeddingSettings } from '~/types/model/wedding/weddingSettings'
-import { getTimezoneText } from '~/utils/time'
+import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
+import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
+import type { Invitee } from '~/types/model/wedding/invitee'
+import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
+import { useWeddingRSVP } from '~/composables/wedding/useWeddingRSVP'
 
 defineOptions({
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Hero',
+  name: 'PageHero',
 })
 
 type Props = {
+  invitee: Invitee | null
+  weddingEvents: WeddingEvent[]
   weddingSettings: WeddingSettings | null
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  weddingSettings: null,
-})
+const props = defineProps<Props>()
 
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
 
@@ -66,6 +94,7 @@ const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
 const isBlur = ref(false)
 const observerElementRef = ref<HTMLDivElement>()
 const observerInstance = ref<IntersectionObserver>()
+
 onMounted(() => {
   if (!observerElementRef.value) return
   const observer = new IntersectionObserver(
@@ -92,52 +121,47 @@ onUnmounted(() => {
 // Events
 // --------------------------------------------------
 
-const { isWeddingEventsSectionShown } = useWeddingSettings(toRef(props, 'weddingSettings'))
+const { sortedViewableWeddingEvents } = useWeddingEvents(
+  toRef(props, 'weddingEvents'),
+  toRef(props, 'invitee'),
+)
+
+// --------------------------------------------------
+// Events: Dates
+// --------------------------------------------------
 
 const dayjs = useNuxtApp().$dayjs
 
-const getEarliestAvailableEvent = (filterFn?: (weddingEvent: WeddingEvent) => boolean) => {
-  const events = [...(props.weddingSettings?.weddingEvents || [])]
-  let nextEvents = events.filter(
-    weddingEvent =>
-      (filterFn ? filterFn(weddingEvent) : true) && dayjs().isBefore(dayjs(weddingEvent.timestamp)),
-  )
+const eventDates = computed(() => [
+  ...Array.from(
+    new Set(
+      sortedViewableWeddingEvents.value.map(weddingEvent => {
+        const { timestamp, timezone } = weddingEvent
+        const dayjsObject = dayjs(timestamp).tz(timezone)
 
-  if (!nextEvents.length) {
-    nextEvents = events.filter(weddingEvent => (filterFn ? filterFn(weddingEvent) : true))
-  }
+        return dayjsObject.format('dddd, D MMMM YYYY')
+      }),
+    ),
+  ),
+])
 
-  return nextEvents.sort((firstEvent, secondEvent) => {
-    const firstEventTimestamp = firstEvent.timestamp || 0
-    const secondEventTimestamp = secondEvent.timestamp || 0
+// --------------------------------------------------
+// Events: Streaming
+// --------------------------------------------------
 
-    return firstEventTimestamp - secondEventTimestamp
-  })[0]
-}
-
-const kvDate = computed(() => {
-  const earliestAvailableEvent = getEarliestAvailableEvent()
-  if (!earliestAvailableEvent) return
-
-  const { timestamp, timezone } = earliestAvailableEvent
-  const dayjsObject = dayjs(timestamp).tz(timezone)
-
-  return dayjsObject.format('dddd, D MMMM YYYY')
-})
-
-const eventToShowStreaming = computed(() =>
-  getEarliestAvailableEvent(weddingEvent => !!weddingEvent.streamingLink),
+const streamingLinks = computed(() =>
+  sortedViewableWeddingEvents.value.filter(event => event.streamingLink),
 )
 
-const streamingEventText = computed(() => {
-  if (!eventToShowStreaming.value) return
+// --------------------------------------------------
+// Events: RSVP
+// --------------------------------------------------
 
-  const { timestamp, timezone } = eventToShowStreaming.value
-  const dayjsObject = dayjs(timestamp).tz(timezone)
-  const time = dayjsObject.format('D MMMM YYYY, HH:mm')
-  const timezoneText = getTimezoneText(eventToShowStreaming.value.timezone, dayjsObject)
-
-  return `${eventToShowStreaming.value.eventName} Live Streaming starts at ${time} ${timezoneText}`
+const { hasRSVP } = useWeddingRSVP({
+  // todo: refactor
+  rsvp: props.weddingSettings ? toRef(props.weddingSettings, 'rsvp') : ref(null),
+  weddingEvents: toRef(props, 'weddingEvents'),
+  invitee: toRef(props, 'invitee'),
 })
 
 // --------------------------------------------------
@@ -291,7 +315,7 @@ onUnmounted(() => {
   &__line {
     height: 1px;
     background: $white;
-    margin: 8px auto;
+    margin: 16px auto;
     @include pc {
       width: 400px;
     }
@@ -302,15 +326,15 @@ onUnmounted(() => {
   &__date {
     @include font-family('marcellus');
     @include font($size: $font-lg, $letter-spacing: 0.05rem);
-    line-height: 2;
+    line-height: 1.75;
     text-align: center;
-    margin-bottom: 16px;
   }
   &__nav-btn {
     @include flex;
     @include font-family('marcellus');
     @include bounce-animation;
     cursor: pointer;
+    margin-top: 16px;
     border-bottom: 1px solid transparent;
     transition: border-color 0.25s;
     &:hover {
@@ -378,17 +402,16 @@ onUnmounted(() => {
     transform: translateX(-50%);
     gap: 16px;
     z-index: 1;
-    @include pc {
-      bottom: 75px;
-    }
-    @include sp {
-      bottom: 25px;
-    }
+    bottom: 50px;
   }
 
   &__buttons {
     @include flex;
     margin-bottom: 16px;
+
+    & > * + * {
+      margin-left: 16px;
+    }
   }
 
   &__button {
@@ -396,22 +419,9 @@ onUnmounted(() => {
     text-decoration: none;
     color: inherit;
     white-space: pre;
-
-    &--left {
-      grid-area: btn-left;
-    }
-
-    &--right {
-      grid-area: btn-right;
-    }
-
-    &:not(:last-child) {
-      margin-right: 16px;
-    }
   }
 
   &__text {
-    grid-area: text;
     text-align: center;
     @include font-family('marcellus');
     @include pc {

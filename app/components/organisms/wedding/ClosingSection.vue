@@ -1,16 +1,19 @@
-<template lang="pug">
-.closing
-  .heading__wrapper(v-if="sectionSettings.title")
-    .heading {{ sectionSettings.title }}
-  .text
-    .text__main {{ sectionSettings.description.main }}
-    .text__sub {{ sectionSettings.description.sub }}
+<template>
+  <div class="closing">
+    <div v-if="sectionSettings.title" class="heading__wrapper">
+      <div class="heading">{{ sectionSettings.title }}</div>
+    </div>
+    <div class="text">
+      <div class="text__main">{{ sectionSettings.description.main }}</div>
+      <div class="text__sub">{{ sectionSettings.description.sub }}</div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import type { SectionSettings } from '~/types/model/wedding/weddingSettings'
 
 defineOptions({
-  name: 'ContentClosing',
+  name: 'ClosingSection',
 })
 
 type Props = {

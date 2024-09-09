@@ -1,11 +1,15 @@
-<template lang="pug">
-.wrapper
-  .container
-    .error
-      .error__text.-heading {{ heading }}
-      .error__text.-subheading {{ subheading }}
-    a(:href="baseURL")
-      img.logo(src="~/assets/images/brand/brand_light.svg")
+<template>
+  <div class="wrapper">
+    <div class="container">
+      <div class="error">
+        <div class="error__text -heading">{{ heading }}</div>
+        <div class="error__text -subheading">{{ subheading }}</div>
+      </div>
+      <a :href="baseURL">
+        <img class="logo" src="~/assets/images/brand/brand_light.svg" />
+      </a>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import type { NuxtError } from '#app'

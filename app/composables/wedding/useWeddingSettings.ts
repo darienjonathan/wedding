@@ -6,12 +6,8 @@ export const useWeddingSettings = (weddingSettings: Ref<WeddingSettings | null>)
     if (!section?.isEnabled) return false
 
     // TODO: check for invitee existence
-    return !section.isExclusiveToInvitees
+    return 'isExclusiveToInvitees' in section ? !section.isExclusiveToInvitees : true
   }
-
-  const isWeddingEventsSectionShown = computed(
-    () => getIsSectionShown('weddingEvents') && weddingSettings.value?.weddingEvents.length,
-  )
 
   const isCoupleSectionShown = computed(() => {
     if (!getIsSectionShown('couple')) return false
@@ -35,7 +31,6 @@ export const useWeddingSettings = (weddingSettings: Ref<WeddingSettings | null>)
   const isClosingSectionShown = computed(() => getIsSectionShown('closing'))
 
   return {
-    isWeddingEventsSectionShown,
     isCoupleSectionShown,
     isStorySectionShown,
     isGallerySectionShown,
