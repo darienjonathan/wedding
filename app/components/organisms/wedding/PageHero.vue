@@ -39,30 +39,57 @@
       </div>
       <div class="bottom__wrapper">
         <div class="bottom__buttons">
-          <div
-            v-if="streamingLinks.length > 0"
+          <button
+            v-if="streamableWeddingEvents.length > 0"
             class="bottom__button"
             :data-is-blur="isButtonBlur"
             target="_blank"
             rel="noopener noreferrer"
-            role="button"
+            @click="isStreamingModalOpen = true"
           >
             {{ 'Attend Online' }}
-          </div>
-          <div
+          </button>
+          <button
             v-if="hasRSVP"
             class="bottom__button"
             :data-is-blur="isButtonBlur"
             target="_blank"
             rel="noopener noreferrer"
-            role="button"
           >
             {{ 'RSVP' }}
-          </div>
+          </button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Streaming Modal -->
+  <AModal
+    :type="isSP ? 'full-size' : 'auto'"
+    :is-open="isStreamingModalOpen"
+    class="modal"
+    @close="isStreamingModalOpen = false"
+  >
+    <MEventContents
+      title="Attend Events Online"
+      description="Below are the links to attend the events online."
+      :wedding-events="streamableWeddingEvents"
+    >
+      <template #content="{ weddingEvent }">
+        <div class="streaming">
+          <div class="streaming__time">{{ formatDate(weddingEvent, true) }}</div>
+          <a
+            :href="weddingEvent.streamingLink"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="streaming__link"
+          >
+            {{ `Click here to attend "${weddingEvent.eventName}" online` }}
+          </a>
+        </div>
+      </template>
+    </MEventContents>
+  </AModal>
 </template>
 <script lang="ts" setup>
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
@@ -70,6 +97,8 @@ import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import type { Invitee } from '~/types/model/wedding/invitee'
 import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
 import { useWeddingRSVP } from '~/composables/wedding/useWeddingRSVP'
+import AModal from '~/components/atoms/AModal.vue'
+import MEventContents from '~/components/molecules/wedding/MEventContents.vue'
 
 defineOptions({
   name: 'PageHero',
@@ -86,6 +115,11 @@ const props = defineProps<Props>()
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
 
 const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
+
+const formatDate = ({ timestamp, timezone }: WeddingEvent, withTime: boolean = false) => {
+  const format = withTime ? 'dddd, D MMMM YYYY, HH:mm' : 'dddd, D MMMM YYYY'
+  return dayjs(timestamp).tz(timezone).format(format)
+}
 
 // --------------------------------------------------
 // Hero Intersection Observer
@@ -118,6 +152,12 @@ onUnmounted(() => {
 })
 
 // --------------------------------------------------
+// Modal
+// --------------------------------------------------
+
+const { isSP } = useMedia()
+
+// --------------------------------------------------
 // Events
 // --------------------------------------------------
 
@@ -134,14 +174,7 @@ const dayjs = useNuxtApp().$dayjs
 
 const eventDates = computed(() => [
   ...Array.from(
-    new Set(
-      sortedViewableWeddingEvents.value.map(weddingEvent => {
-        const { timestamp, timezone } = weddingEvent
-        const dayjsObject = dayjs(timestamp).tz(timezone)
-
-        return dayjsObject.format('dddd, D MMMM YYYY')
-      }),
-    ),
+    new Set(sortedViewableWeddingEvents.value.map(weddingEvent => formatDate(weddingEvent, false))),
   ),
 ])
 
@@ -149,9 +182,11 @@ const eventDates = computed(() => [
 // Events: Streaming
 // --------------------------------------------------
 
-const streamingLinks = computed(() =>
+const streamableWeddingEvents = computed(() =>
   sortedViewableWeddingEvents.value.filter(event => event.streamingLink),
 )
+
+const isStreamingModalOpen = ref(false)
 
 // --------------------------------------------------
 // Events: RSVP
@@ -431,5 +466,16 @@ onUnmounted(() => {
       @include font($size: $font-xs);
     }
   }
+}
+
+// Modals
+
+.streaming__time {
+  @include font($size: $font-lg, $color: $white);
+  margin-block-end: 8px;
+}
+
+.streaming__link {
+  @include font($size: $font-lg, $color: $white);
 }
 </style>
