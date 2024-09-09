@@ -138,10 +138,6 @@ const {
   isClosingSectionShown,
 } = useWeddingSettings(weddingSettings)
 
-// --------------------------------------------------
-// Client Side - Firebase
-// --------------------------------------------------
-
 const { useInvitees } = useFirestoreCollections()
 const inviteesFirestore = useInvitees(tenantId)
 
