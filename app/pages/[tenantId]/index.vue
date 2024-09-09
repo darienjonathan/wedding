@@ -144,7 +144,11 @@ const {
 
 const { useInvitees } = useFirestoreCollections()
 const inviteesFirestore = useInvitees(tenantId)
-const invitee = inviteeUid ? await inviteesFirestore.loadDocument(inviteeUid) : null
+
+const { data: invitee } = useAsyncData('invitee', async () => {
+  if (!inviteeUid) return null
+  return inviteesFirestore.loadDocument(inviteeUid)
+})
 
 // --------------------------------------------------
 // Client Side
