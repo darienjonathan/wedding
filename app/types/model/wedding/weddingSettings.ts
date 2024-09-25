@@ -27,13 +27,13 @@ export const parseRSVPFormType = (data: any = {}): RSVPFormType => {
   }
 }
 
-export type RSVP = {
+export type RSVPForm = {
   isEnabled: boolean
   formType: RSVPFormType
   content: string
 }
 
-export const parseRSVP = (data: any = {}): RSVP => ({
+export const parseRSVPForm = (data: any = {}): RSVPForm => ({
   isEnabled: parseBoolean(data.isEnabled),
   formType: parseRSVPFormType(data.formType),
   content: parseString(data.content),
@@ -164,7 +164,7 @@ export const parseEventsSectionSettings = (data: any = {}): EventsSectionSetting
 export type WeddingSettings = {
   ogpImageSrc: string
   couple: [Person, Person]
-  rsvp: RSVP
+  rsvpForm: RSVPForm
   stories: Story[]
   gallery: Gallery
   registries: Registry[]
@@ -184,7 +184,7 @@ export type WeddingSettings = {
 export const parseWeddingSettings = (data: any = {}): WeddingSettings => ({
   ogpImageSrc: parseString(data.ogpImageSrc),
   couple: [parsePerson(data.couple?.[0]), parsePerson(data.couple?.[1])],
-  rsvp: parseRSVP(data.rsvp),
+  rsvpForm: parseRSVPForm(data.rsvpForm),
   stories: parseArray(data.stories, parseStory),
   registries: parseArray(data.registries, data => data as Registry),
   gallery: parseGallery(data.gallery),

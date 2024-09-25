@@ -51,15 +51,32 @@
           </div>
         </div>
       </template>
-      <template v-if="rsvp && hasRSVP">
+      <template v-if="rsvpForm && hasRSVP">
         <div class="content">
           <div class="content__heading">RSVP</div>
-          <!-- TODO: Other RSVP Formats -->
-          <template v-if="rsvp.formType === RSVPFormTypes.markdown">
+
+          <template v-if="rsvpForm.formType === RSVPFormTypes.markdown">
             <div class="content__item">
               <div class="item__text">
                 <div class="item__info">
                   <AMarkdown class="info__markdown" :content="markdown" />
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template v-if="rsvpForm.formType === RSVPFormTypes.sheet">
+            <div class="content__item">
+              <div class="item__text">
+                <div class="item__info">
+                  <a
+                    class="button"
+                    :href="rsvpForm.content"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    role="button"
+                    >{{ 'RSVP' }}</a
+                  >
                 </div>
               </div>
             </div>
@@ -73,7 +90,7 @@
 import AMarkdown from '~/components/atoms/AMarkdown.vue'
 import { useMap } from '~/composables/wedding/useMap'
 import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
-import type { RSVP, EventsSectionSettings } from '~/types/model/wedding/weddingSettings'
+import type { RSVPForm, EventsSectionSettings } from '~/types/model/wedding/weddingSettings'
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
 import type { Invitee } from '~/types/model/wedding/invitee'
 import { getTimezoneText } from '~/utils/time'
@@ -85,12 +102,14 @@ defineOptions({
 
 type Props = {
   weddingEvents: WeddingEvent[]
-  rsvp: RSVP | null
+  rsvpForm: RSVPForm | null
   invitee: Invitee | null
   sectionSettings: EventsSectionSettings | null
 }
 
 const props = defineProps<Props>()
+
+defineEmits(['rsvpButtonClick'])
 
 const { sortedViewableWeddingEvents } = useWeddingEvents(
   toRef(props, 'weddingEvents'),
@@ -115,14 +134,14 @@ const { mapElementRefs } = useMap(sortedViewableWeddingEvents)
 
 const hasRSVP = computed(
   () =>
-    !!props.rsvp?.isEnabled &&
+    !!props.rsvpForm?.isEnabled &&
     sortedViewableWeddingEvents.value.some(weddingEvent => !!weddingEvent.rsvp),
 )
 
 const markdown = ref()
 
 watch(
-  () => props.rsvp,
+  () => props.rsvpForm,
   async (rsvp): Promise<void> => {
     if (!rsvp) return
     if (rsvp.formType !== RSVPFormTypes.markdown) return

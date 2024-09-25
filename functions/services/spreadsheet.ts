@@ -31,7 +31,9 @@ export const getSheetId = async (tenantId: string) => {
   const weddingSettings = await weddingSettingsFirestore.loadDocument(
     WEDDING_SETTINGS_SINGLETON_DOCUMENT_ID,
   )
-  return weddingSettings?.rsvp.formType === RSVPFormTypes.sheet && weddingSettings.rsvp.content
+  return (
+    weddingSettings?.rsvpForm.formType === RSVPFormTypes.sheet && weddingSettings.rsvpForm.content
+  )
 }
 
 export const getWeddingEventEntries = async (

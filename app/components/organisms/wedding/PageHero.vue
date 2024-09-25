@@ -55,6 +55,7 @@
             :data-is-blur="isButtonBlur"
             target="_blank"
             rel="noopener noreferrer"
+            @click="emit('rsvpButtonClick')"
           >
             {{ 'RSVP' }}
           </button>
@@ -64,32 +65,11 @@
   </div>
 
   <!-- Streaming Modal -->
-  <AModal
-    :type="isSP ? 'full-size' : 'auto'"
+  <StreamingModal
     :is-open="isStreamingModalOpen"
-    class="modal"
+    :wedding-events="streamableWeddingEvents"
     @close="isStreamingModalOpen = false"
-  >
-    <MEventContents
-      title="Attend Events Online"
-      description="Below are the links to attend the events online."
-      :wedding-events="streamableWeddingEvents"
-    >
-      <template #content="{ weddingEvent }">
-        <div class="streaming">
-          <div class="streaming__time">{{ formatDate(weddingEvent, true) }}</div>
-          <a
-            :href="weddingEvent.streamingLink"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="streaming__link"
-          >
-            {{ `Click here to attend "${weddingEvent.eventName}" online` }}
-          </a>
-        </div>
-      </template>
-    </MEventContents>
-  </AModal>
+  />
 </template>
 <script lang="ts" setup>
 import type { WeddingEvent } from '~/types/model/wedding/weddingEvent'
@@ -97,8 +77,9 @@ import type { WeddingSettings } from '~/types/model/wedding/weddingSettings'
 import type { Invitee } from '~/types/model/wedding/invitee'
 import { useWeddingEvents } from '~/composables/wedding/useWeddingEvents'
 import { useWeddingRSVP } from '~/composables/wedding/useWeddingRSVP'
-import AModal from '~/components/atoms/AModal.vue'
-import MEventContents from '~/components/molecules/wedding/MEventContents.vue'
+import StreamingModal from '~/components/organisms/wedding/StreamingModal.vue'
+
+const dayjs = useNuxtApp().$dayjs
 
 defineOptions({
   name: 'PageHero',
@@ -114,12 +95,10 @@ const props = defineProps<Props>()
 
 const title = computed(() => props.weddingSettings?.hero.title.replace(/ /g, '\n') || '')
 
-const emit = defineEmits(['loadingDone', 'navClick', 'RSVPButtonClick'])
+const emit = defineEmits(['loadingDone', 'navClick', 'rsvpButtonClick'])
 
-const formatDate = ({ timestamp, timezone }: WeddingEvent, withTime: boolean = false) => {
-  const format = withTime ? 'dddd, D MMMM YYYY, HH:mm' : 'dddd, D MMMM YYYY'
-  return dayjs(timestamp).tz(timezone).format(format)
-}
+const formatDate = ({ timestamp, timezone }: WeddingEvent) =>
+  dayjs(timestamp).tz(timezone).format('dddd, D MMMM YYYY')
 
 // --------------------------------------------------
 // Hero Intersection Observer
@@ -152,12 +131,6 @@ onUnmounted(() => {
 })
 
 // --------------------------------------------------
-// Modal
-// --------------------------------------------------
-
-const { isSP } = useMedia()
-
-// --------------------------------------------------
 // Events
 // --------------------------------------------------
 
@@ -170,11 +143,9 @@ const { sortedViewableWeddingEvents } = useWeddingEvents(
 // Events: Dates
 // --------------------------------------------------
 
-const dayjs = useNuxtApp().$dayjs
-
 const eventDates = computed(() => [
   ...Array.from(
-    new Set(sortedViewableWeddingEvents.value.map(weddingEvent => formatDate(weddingEvent, false))),
+    new Set(sortedViewableWeddingEvents.value.map(weddingEvent => formatDate(weddingEvent))),
   ),
 ])
 
@@ -194,7 +165,7 @@ const isStreamingModalOpen = ref(false)
 
 const { hasRSVP } = useWeddingRSVP({
   // todo: refactor
-  rsvp: props.weddingSettings ? toRef(props.weddingSettings, 'rsvp') : ref(null),
+  rsvpForm: props.weddingSettings ? toRef(props.weddingSettings, 'rsvpForm') : ref(null),
   weddingEvents: toRef(props, 'weddingEvents'),
   invitee: toRef(props, 'invitee'),
 })
@@ -466,16 +437,5 @@ onUnmounted(() => {
       @include font($size: $font-xs);
     }
   }
-}
-
-// Modals
-
-.streaming__time {
-  @include font($size: $font-lg, $color: $white);
-  margin-block-end: 8px;
-}
-
-.streaming__link {
-  @include font($size: $font-lg, $color: $white);
 }
 </style>

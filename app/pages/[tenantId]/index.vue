@@ -4,14 +4,13 @@
       <div ref="observerElementRef" class="buttons-intersection-observer" />
       <div class="wrapper">
         <PageHero
-          class="hero"
           :wedding-settings="weddingSettings"
           :wedding-events="weddingEvents"
           :invitee="invitee"
           @nav-click="handleNavClick"
           @loading-done="handleLoadingDone"
-        >
-        </PageHero>
+          @rsvp-button-click="handleRSVPButtonClick"
+        />
         <div v-if="weddingSettings" class="content">
           <AboutUs
             v-if="isCoupleSectionShown"
@@ -24,8 +23,9 @@
             class="events"
             :wedding-events="weddingEvents"
             :invitee="invitee"
-            :rsvp="weddingSettings.rsvp"
+            :rsvp-form="weddingSettings.rsvpForm"
             :section-settings="weddingSettings.sectionSettings.weddingEvents"
+            @rsvp-button-click="handleRSVPButtonClick"
           />
           <OurStory
             v-if="isStorySectionShown"
@@ -62,6 +62,15 @@
           <PageFooter class="footer" :type="weddingSettings.footer.type" />
         </div>
       </div>
+
+      <RSVPModal
+        v-if="invitee"
+        :is-open="isRSVPModalOpen"
+        :wedding-settings="weddingSettings"
+        :wedding-events="weddingEvents"
+        :invitee="invitee"
+        :invitee-r-s-v-p="inviteeRSVP"
+      />
     </MPageLoading>
   </div>
 </template>
@@ -78,6 +87,7 @@ import PageFooter from '~~/components/organisms/wedding/PageFooter.vue'
 import ImageGallery from '~~/components/organisms/wedding/ImageGallery.vue'
 import OurStory from '~~/components/organisms/wedding/OurStory.vue'
 import WeddingWishes from '~~/components/organisms/wedding/WeddingWishes.vue'
+import RSVPModal from '~~/components/organisms/wedding/RSVPModal.vue'
 import type { FetchWeddingEventsResponse } from '~/server/api/fetchWeddingEvents'
 import type { FetchWeddigSettingsResponse } from '~/server/api/fetchWeddingSettings'
 
@@ -138,12 +148,17 @@ const {
   isClosingSectionShown,
 } = useWeddingSettings(weddingSettings)
 
-const { useInvitees } = useFirestoreCollections()
+const { useInvitees, useInviteeRSVP } = useFirestoreCollections()
 const inviteesFirestore = useInvitees(tenantId)
+const inviteeRSVPFirestore = useInviteeRSVP(tenantId)
 
 const { data: invitee } = useAsyncData('invitee', async () => {
   if (!inviteeUid) return null
   return inviteesFirestore.loadDocument(inviteeUid)
+})
+const { data: inviteeRSVP } = useAsyncData('inviteeRSVP', async () => {
+  if (!inviteeUid) return null
+  return inviteeRSVPFirestore.loadDocument(inviteeUid)
 })
 
 // --------------------------------------------------
@@ -168,6 +183,16 @@ const handleNavClick = () => {
   const element = eventsElementRef.value.$el as HTMLElement
   const eventsTop = element.getBoundingClientRect().top
   scrollTo(0, eventsTop)
+}
+
+// --------------------------------------------------
+// RSVP Modal
+// --------------------------------------------------
+
+const isRSVPModalOpen = ref(false)
+
+const handleRSVPButtonClick = () => {
+  isRSVPModalOpen.value = true
 }
 
 // --------------------------------------------------
